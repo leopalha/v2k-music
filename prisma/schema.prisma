@@ -85,6 +85,7 @@ model User {
   copyingFrom   CopyTrade[] @relation("CopierRelation")  // Traders this user copies
   copiedBy      CopyTrade[] @relation("TraderRelation")  // Users copying this trader
   apiKeys       ApiKey[]    // Developer API keys
+  webhooks      Webhook[]   // User webhooks
 
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -884,4 +885,60 @@ enum ApiKeyStatus {
 enum ApiEnvironment {
   PRODUCTION
   SANDBOX
+}
+
+// ====== WEBHOOKS ======
+
+model Webhook {
+  id                String            @id @default(cuid())
+  userId            String
+  
+  // Webhook configuration
+  url               String            // Endpoint URL
+  secret            String            // HMAC signing secret
+  events            String[]          // Subscribed events
+  description       String?
+  
+  // Status
+  isActive          Boolean           @default(true)
+  failureCount      Int               @default(0)
+  lastTriggeredAt   DateTime?
+  lastFailedAt      DateTime?
+  
+  // Relations
+  user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deliveries        WebhookDelivery[]
+  
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  
+  @@index([userId])
+  @@index([isActive])
+}
+
+model WebhookDelivery {
+  id                String            @id @default(cuid())
+  webhookId         String
+  
+  // Event details
+  event             String            // Event type (e.g., "trade.completed")
+  payload           Json              // Event payload
+  
+  // Delivery details
+  response          String?           // Response body
+  statusCode        Int?              // HTTP status code
+  success           Boolean           @default(false)
+  attempt           Int               @default(1)
+  errorMessage      String?
+  duration          Int?              // Response time in ms
+  
+  // Relations
+  webhook           Webhook           @relation(fields: [webhookId], references: [id], onDelete: Cascade)
+  
+  createdAt         DateTime          @default(now())
+  
+  @@index([webhookId])
+  @@index([event])
+  @@index([success])
+  @@index([createdAt])
 }
