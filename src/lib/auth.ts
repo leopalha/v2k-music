@@ -1,8 +1,6 @@
 import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
-import { compare } from 'bcryptjs';
-import { prisma } from '@/lib/db/prisma';
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -21,53 +19,18 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email,
-          },
-        });
-
-        if (!user || !user.hashedPassword) {
-          return null;
-        }
-
-        const isPasswordValid = await compare(
-          credentials.password,
-          user.hashedPassword
-        );
-
-        if (!isPasswordValid) {
-          return null;
-        }
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          image: user.profileImageUrl,
-        };
+        // Dynamic import to avoid bundling server-only code in client
+        const { validateCredentials } = await import('@/lib/auth-helpers');
+        return await validateCredentials(credentials.email, credentials.password);
       },
     }),
   ],
   callbacks: {
     async signIn({ user, account }) {
       if (account?.provider === 'google') {
-        // Check if user exists, if not create
-        const existingUser = await prisma.user.findUnique({
-          where: { email: user.email! },
-        });
-
-        if (!existingUser) {
-          await prisma.user.create({
-            data: {
-              email: user.email!,
-              name: user.name || '',
-              profileImageUrl: user.image,
-              hashedPassword: null,
-              onboardingCompleted: false,
-            },
-          });
-        }
+        // Dynamic import to avoid bundling server-only code in client
+        const { findOrCreateGoogleUser } = await import('@/lib/auth-helpers');
+        await findOrCreateGoogleUser(user.email!, user.name ?? null, user.image ?? null);
       }
       return true;
     },
