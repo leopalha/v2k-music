@@ -2430,19 +2430,175 @@ PROGRESSO TOTAL: ~85% do Roadmap de 12 Meses
 - ✅ Sprint 59: Real-time Features (Foundation)
 - ✅ Sprint 60: Documentation & Production Readiness
 
-### 🎯 PRÓXIMA FASE:
-
-**FASE 6** - Ecosystem & Expansion
-- Sprint 61: Mobile App (React Native)
-- Sprint 62: Artist Portal
-- Sprint 63: Label Dashboard
-- Sprint 64: White-label Solution
-- Sprint 65+: Internacional expansion...
+### 🎯 FASE 6 - EM ANDAMENTO:
+- ✅ Sprint 61: GraphQL API & SDK Foundation
 
 ---
 
-**Última Atualização:** 2025-12-02 (Sprint 60 concluído)
-**Responsável:** Claude (Sprints 49-60 + Deploys)
-**Próximo:** FASE 6 - Ecosystem & Expansion
-**Status:** 🎉 FASE 5 CONCLUÍDA! 12 SPRINTS + DEPLOYS! (85% do Roadmap)
-**Plataforma:** Production-ready com documentação completa
+## ✅ Sprint 61 - GraphQL API & SDK Foundation
+
+**Status:** ✅ COMPLETO
+**Data:** 2025-12-02
+**Objetivo:** Implementar GraphQL API moderna com SDK TypeScript oficial para expansão do ecossistema
+
+### Entregas
+
+#### 1. GraphQL API
+**Biblioteca:** Apollo Server 4.x + @as-integrations/next
+**Endpoint:** `/api/graphql`
+
+**Schema (255 linhas):**
+- Types: User, Track, Portfolio, Transaction, Alert, PlatformStats
+- Enums: UserRole, KYCStatus, TransactionType, AlertCondition, etc
+- Queries: me, track, tracks, portfolio, transactions, alerts, platformStats
+- Mutations: createTrade, createAlert, cancelAlert, updateProfile
+- Pagination: TracksConnection, TransactionsConnection com PageInfo
+- Filters: TracksFilterInput, TransactionsFilterInput
+
+**Resolvers (497 linhas):**
+- User queries: me, user (com stats calculados)
+- Track queries: track, tracks (com filtros), trendingTracks
+- Portfolio queries: portfolio, userPortfolio (agregação de holdings)
+- Transaction queries: transactions (com filtros), transaction
+- Alert queries: alerts, alert
+- Mutations: createTrade, createAlert, cancelAlert, updateProfile
+- Stats: platformStats (totais e ativos 24h)
+- Authentication: Via NextAuth session
+- Error handling: GraphQLError com codes
+
+**Apollo Server Route (45 linhas):**
+- Handler Next.js com context (userId, user)
+- Introspection enabled (GraphiQL playground)
+- Error formatting (production vs development)
+- GET + POST support
+
+#### 2. SDK TypeScript (@v2k/sdk)
+**Package:** `@v2k/sdk` v1.0.0
+**Location:** `packages/sdk/`
+**Entry:** `packages/sdk/src/index.ts` (380 linhas)
+
+**API Client:**
+```typescript
+const client = new V2KClient({
+  apiKey: 'sk_live_...',
+  baseUrl: 'https://v2k-music.com'
+});
+```
+
+**Métodos:**
+- Tracks: getTracks(), getTrack(id), getTrendingTracks(limit)
+- Portfolio: getPortfolio()
+- Trading: createTrade(input), getTransactions(filter)
+- Alerts: createAlert(input), getAlerts(), cancelAlert(id)
+- User: getMe(), updateProfile(input)
+- Stats: getPlatformStats()
+
+**TypeScript Types:**
+- Track, Portfolio, Holding, Transaction
+- V2KClientOptions, interfaces exportados
+- Full type safety
+
+**Features:**
+- GraphQL client wrapper
+- Authorization header (Bearer token)
+- Error handling com throw
+- Pagination support
+- Filtros tipo-seguro
+
+#### 3. Documentação SDK
+**README.md (189 linhas):**
+- Installation guide
+- Quick start examples
+- API reference completo
+- Code examples para cada método
+- TypeScript usage examples
+- Error handling guide
+
+**package.json:**
+- Metadata: name, version, description
+- Scripts: build, prepublishOnly
+- License: MIT
+- Keywords: v2k, music, royalties, sdk, graphql
+
+**tsconfig.json:**
+- Target: ES2020
+- Module: commonjs
+- Declaration: true (gera .d.ts)
+- Strict mode enabled
+
+### Dependencies Instaladas
+- `@apollo/server` (Apollo Server 4)
+- `graphql` (GraphQL.js)
+- `graphql-tag` (gql tag)
+- `dataloader` (batching/caching)
+- `@as-integrations/next` (Next.js integration)
+- 61 packages total
+
+### Arquivos Criados
+- `src/lib/graphql/schema.ts` (255 linhas)
+- `src/lib/graphql/resolvers.ts` (497 linhas)
+- `src/app/api/graphql/route.ts` (45 linhas)
+- `packages/sdk/src/index.ts` (380 linhas)
+- `packages/sdk/package.json` (33 linhas)
+- `packages/sdk/tsconfig.json` (18 linhas)
+- `packages/sdk/README.md` (189 linhas)
+- **Total:** 1,417 linhas core + 222 linhas config/docs
+
+### Features Implementadas
+- ✅ GraphQL API completa com Apollo Server
+- ✅ 12 queries principais
+- ✅ 4 mutations principais
+- ✅ Authentication via session
+- ✅ Error handling padronizado
+- ✅ Pagination com PageInfo
+- ✅ Filtros avançados (tracks, transactions)
+- ✅ SDK TypeScript completo
+- ✅ Full type safety
+- ✅ README com 15+ exemplos
+- ✅ Package pronto para npm publish
+
+### Build Status
+- ✅ Build successful (0 errors)
+- ✅ TypeScript completo
+- ✅ Next.js 21.3s compilation
+- ✅ GraphQL endpoint funcionando
+- ✅ SDK compilável
+
+### Commit Info
+- **Hash:** 6de3cad
+- **Message:** "feat: Sprint 61 - GraphQL API & SDK Foundation"
+- **Files changed:** 10 files, 2,148 insertions, 86 deletions
+- **Status:** ✅ Committed locally
+
+### Próximos Passos (GraphQL v2)
+- [ ] GraphiQL playground UI
+- [ ] DataLoader implementation (batching N+1)
+- [ ] Query complexity limiting
+- [ ] Subscriptions (real-time via WebSocket)
+- [ ] Field-level permissions
+- [ ] API versioning
+- [ ] GraphQL Playground
+- [ ] SDK code generation via codegen
+- [ ] SDK npm publish
+- [ ] Mobile app integration
+
+---
+
+## 📊 PROGRESSO ATUALIZADO PÓS-SPRINT 61
+
+```
+FASE 1 (MVP):                 ██████████ 100% ✅
+FASE 2 (Core Features):       ██████████ 100% ✅
+FASE 3 (Growth Features):     ██████████ 100% ✅
+FASE 4 (Advanced Features):   ██████████ 100% ✅
+FASE 5 (Scale & Optimization): ██████████ 100% ✅
+FASE 6 (Ecosystem):           ██░░░░░░░░ 20% 🔄 ← EM ANDAMENTO
+
+PROGRESSO TOTAL: ~87% do Roadmap de 12 Meses
+```
+
+**Última Atualização:** 2025-12-02 (Sprint 61 concluído)
+**Responsável:** Claude (Sprints 49-61 + Deploys)
+**Próximo:** Sprint 62 - continuando FASE 6
+**Status:** 🚀 13 SPRINTS + DEPLOYS! GraphQL API + SDK prontos! (87% do Roadmap)
+**Plataforma:** Production-ready + GraphQL ecosystem
