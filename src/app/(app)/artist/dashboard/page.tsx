@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { AppLayout, PageHeader } from "@/components/layout";
 import { Button } from "@/components/ui";
 import {
@@ -13,78 +15,103 @@ import {
   MoreVertical,
   Upload,
   BarChart3,
+  Loader2,
 } from "lucide-react";
 import { formatCurrency, formatNumber } from "@/lib/utils";
+import Link from "next/link";
 
-// Mock data
-const mockArtistStats = {
-  totalEarnings: 45000,
-  monthlyEarnings: 8500,
-  totalStreams: 12500000,
-  totalInvestors: 342,
-  tracksListed: 5,
-};
+interface ArtistStats {
+  totalEarnings: number;
+  monthlyEarnings: number;
+  totalStreams: number;
+  totalInvestors: number;
+  tracksListed: number;
+  pendingTracks: number;
+}
 
-const mockTracks = [
-  {
-    id: 1,
-    title: "Modo Turbo",
-    coverUrl: "/api/placeholder/80/80",
-    status: "active",
-    tokensTotal: 10000,
-    tokensSold: 6500,
-    currentPrice: 0.015,
-    totalRaised: 97.5,
-    monthlyStreams: 2500000,
-    monthlyRoyalties: 2500,
-  },
-  {
-    id: 2,
-    title: "Rave de Favela",
-    coverUrl: "/api/placeholder/80/80",
-    status: "active",
-    tokensTotal: 8000,
-    tokensSold: 6000,
-    currentPrice: 0.02,
-    totalRaised: 120,
-    monthlyStreams: 1800000,
-    monthlyRoyalties: 1800,
-  },
-  {
-    id: 3,
-    title: "Beat Envolvente",
-    coverUrl: "/api/placeholder/80/80",
-    status: "pending",
-    tokensTotal: 12000,
-    tokensSold: 0,
-    currentPrice: 0.01,
-    totalRaised: 0,
-    monthlyStreams: 0,
-    monthlyRoyalties: 0,
-  },
-];
+interface Track {
+  id: string;
+  title: string;
+  coverUrl: string;
+  status: string;
+  tokenInfo: {
+    total: number;
+    sold: number;
+    available: number;
+    pricePerToken: number;
+  };
+  earnings: {
+    totalRaised: number;
+    monthlyStreams: number;
+    monthlyRoyalties: number;
+  };
+  holders: number;
+}
 
 export default function ArtistDashboardPage() {
-  const [selectedTrack, setSelectedTrack] = useState<number | null>(null);
+  const router = useRouter();
+  const { data: session } = useSession();
+  const [stats, setStats] = useState<ArtistStats | null>(null);
+  const [tracks, setTracks] = useState<Track[]>([]);
+  const [isLoadingStats, setIsLoadingStats] = useState(true);
+  const [isLoadingTracks, setIsLoadingTracks] = useState(true);
+  const [error, setError] = useState("");
+
+  // Fetch stats on mount
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await fetch("/api/artist/stats");
+        if (!res.ok) throw new Error("Failed to fetch stats");
+        const data = await res.json();
+        setStats(data);
+      } catch (err) {
+        console.error(err);
+        setError("Erro ao carregar estatísticas");
+      } finally {
+        setIsLoadingStats(false);
+      }
+    };
+    fetchStats();
+  }, []);
+
+  // Fetch tracks on mount
+  useEffect(() => {
+    const fetchTracks = async () => {
+      try {
+        const res = await fetch("/api/artist/tracks");
+        if (!res.ok) throw new Error("Failed to fetch tracks");
+        const data = await res.json();
+        setTracks(data.tracks || []);
+      } catch (err) {
+        console.error(err);
+        setError("Erro ao carregar músicas");
+      } finally {
+        setIsLoadingTracks(false);
+      }
+    };
+    fetchTracks();
+  }, []);
 
   const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "active":
+    const normalized = status.toUpperCase();
+    switch (normalized) {
+      case "LIVE":
         return (
           <span className="px-2 py-1 bg-accent-green/10 text-accent-green text-xs font-medium rounded-full">
             Ativo
           </span>
         );
-      case "pending":
+      case "PENDING":
         return (
           <span className="px-2 py-1 bg-yellow-500/10 text-yellow-500 text-xs font-medium rounded-full">
             Pendente
           </span>
         );
-      case "sold_out":
+      case "REJECTED":
         return (
-          <span className="px-2 py-1 bg-primary/10 text-primary text-xs font-medium rounded-full">
-            Esgotado
+          <span className="px-2 py-1 bg-error/10 text-error text-xs font-medium rounded-full">
+            Rejeitado
           </span>
         );
       default:
