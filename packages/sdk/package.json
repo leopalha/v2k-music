@@ -1,0 +1,33 @@
+{
+  "name": "@v2k/sdk",
+  "version": "1.0.0",
+  "description": "Official TypeScript/JavaScript SDK for V2K Music Platform",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "v2k",
+    "music",
+    "royalties",
+    "investment",
+    "sdk",
+    "graphql"
+  ],
+  "author": "V2K Music",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "peerDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/v2k-music/sdk"
+  },
+  "bugs": {
+    "url": "https://github.com/v2k-music/sdk/issues"
+  },
+  "homepage": "https://v2k-music.com/developer/sdk"
+}

@@ -16,6 +16,8 @@
     "vercel-build": "prisma generate && prisma migrate deploy && next build"
   },
   "dependencies": {
+    "@apollo/server": "^5.2.0",
+    "@as-integrations/next": "^4.1.0",
     "@prisma/client": "^5.22.0",
     "@radix-ui/react-avatar": "^1.1.11",
     "@radix-ui/react-dialog": "^1.1.15",
@@ -31,7 +33,10 @@
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dataloader": "^2.2.3",
     "date-fns": "^4.1.0",
+    "graphql": "^16.12.0",
+    "graphql-tag": "^2.12.6",
     "jspdf": "^3.0.4",
     "jspdf-autotable": "^5.0.2",
     "lightweight-charts": "^5.0.9",
