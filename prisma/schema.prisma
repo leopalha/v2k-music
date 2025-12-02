@@ -1,0 +1,878 @@
+// V2K - Music Investment Platform
+// Prisma Schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ====== USER & AUTH ======
+
+model User {
+  id                String    @id @default(cuid())
+  email             String    @unique
+  name              String?
+  hashedPassword    String?   // NextAuth compatible (renamed from passwordHash)
+  profileImageUrl   String?   // NextAuth compatible (renamed from avatar)
+  onboardingCompleted Boolean @default(false) // NextAuth compatible
+
+  // Password reset
+  resetToken        String?
+  resetTokenExpiry  DateTime?
+
+  walletAddress     String?   @unique
+  username          String?   @unique
+  bio               String?
+
+  // KYC
+  fullName          String?
+  cpf               String?   @unique
+  birthDate         DateTime?
+  phone             String?
+  kycStatus         KycStatus @default(NOT_VERIFIED)
+  kycVerifiedAt     DateTime?
+
+  // Gamification
+  level         Int       @default(1)
+  xp            Int       @default(0)
+  badges        String[]  // Array of badge IDs
+
+  // Referral
+  referralCode  String    @unique @default(cuid())
+  referredById  String?
+  referredBy    User?     @relation("Referrals", fields: [referredById], references: [id])
+  referrals     User[]    @relation("Referrals")
+
+  // Balance
+  cashBalance   Float     @default(0)
+
+  // Notification Preferences
+  emailNotifications    Boolean @default(true)
+  notifyInvestments     Boolean @default(true)
+  notifyRoyalties       Boolean @default(true)
+  notifyPriceAlerts     Boolean @default(true)
+  notifyNewTracks       Boolean @default(false)
+
+  // Portfolio Sharing Settings
+  portfolioPublic       Boolean @default(false)
+  shareSlug             String? @unique
+  showHoldings          Boolean @default(true)
+  showPerformance       Boolean @default(true)
+
+  // Relations
+  tracks        Track[]   @relation("ArtistTracks")
+  transactions  Transaction[]
+  portfolio     Portfolio[]
+  comments      Comment[]
+  favorites     Favorite[]
+  priceAlerts   PriceAlert[]
+  limitOrders   LimitOrder[]
+  commentLikes  CommentLike[]
+  referrerReferrals  Referral[] @relation("ReferrerReferrals")
+  refereeReferrals   Referral[] @relation("RefereeReferrals")
+  notifications Notification[]
+  following     Follow[]  @relation("UserFollowing")
+  followers     Follow[]  @relation("UserFollowers")
+  userStats     UserStats?
+  achievements  Achievement[]
+  copyingFrom   CopyTrade[] @relation("CopierRelation")  // Traders this user copies
+  copiedBy      CopyTrade[] @relation("TraderRelation")  // Users copying this trader
+  apiKeys       ApiKey[]    // Developer API keys
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([walletAddress])
+  @@index([referralCode])
+  @@index([kycStatus])
+}
+
+enum KycStatus {
+  NOT_VERIFIED
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+// ====== MUSIC TRACKS ======
+
+model Track {
+  id              String      @id @default(cuid())
+
+  // Blockchain data
+  tokenId         Int?        @unique
+  contractAddress String?
+
+  // Metadata
+  title           String
+  artistName      String
+  artistId        String?
+  genre           Genre
+  bpm             Int?
+  key             String?
+  duration        Int         // seconds
+
+  // Files
+  audioUrl        String      // IPFS hash
+  coverUrl        String
+  waveformData    Json?       // For visualization
+
+  // AI Analysis
+  aiScore         Int         @default(0) // 0-100
+  predictedROI    Float?      // Expected return
+  viralProbability Float?     // 0-1
+
+  // Market data
+  totalSupply     Int         @default(10000)
+  availableSupply Int         @default(10000)
+  currentPrice    Float       @default(1)
+  initialPrice    Float       @default(1)
+  marketCap       Float       @default(10000) // price * supply
+  volume24h       Float       @default(0)
+  priceChange24h  Float       @default(0)
+  holders         Int         @default(0)
+
+  // Performance
+  totalStreams    Int         @default(0)
+  spotifyStreams  Int         @default(0)
+  youtubeViews    Int         @default(0)
+  tiktokViews     Int         @default(0)
+
+  // Royalties
+  totalRoyalties  Float       @default(0)
+  monthlyRoyalty  Float       @default(0)
+  lastRoyaltyDate DateTime?
+
+  // Status
+  status          TrackStatus @default(PENDING)
+  isActive        Boolean     @default(true)
+  isFeatured      Boolean     @default(false)
+
+  // Relations
+  artist          User?       @relation("ArtistTracks", fields: [artistId], references: [id])
+  transactions    Transaction[]
+  portfolio       Portfolio[]
+  comments        Comment[]
+  priceHistory    PriceHistory[]
+  favorites       Favorite[]
+  priceAlerts     PriceAlert[]
+  limitOrders     LimitOrder[]
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([tokenId])
+  @@index([genre])
+  @@index([aiScore])
+  @@index([status])
+  @@index([createdAt])
+  @@index([isFeatured])
+}
+
+enum Genre {
+  TRAP
+  FUNK
+  RAP
+  RNB
+  REGGAETON
+  POP
+  ELECTRONIC
+  ROCK
+  OTHER
+}
+
+enum TrackStatus {
+  PENDING    // Submitted, waiting for AI review
+  APPROVED   // Approved by AI, being tokenized
+  LIVE       // Tokenized and trading
+  REJECTED   // Rejected by AI
+  PAUSED     // Temporarily not tradeable
+}
+
+// ====== TRANSACTIONS ======
+
+model Transaction {
+  id            String          @id @default(cuid())
+
+  // Blockchain data
+  txHash        String?         @unique
+  blockNumber   Int?
+
+  // Transaction details
+  type          TransactionType
+  trackId       String
+  userId        String
+  amount        Int             // number of tokens
+  price         Float           // price per token
+  totalValue    Float           // amount * price
+  fee           Float           // platform fee
+  status        PaymentStatus   @default(PENDING)
+
+  // Payment info
+  paymentMethod PaymentMethod?
+  stripePaymentId String?
+
+  // Relations
+  track         Track           @relation(fields: [trackId], references: [id])
+  user          User            @relation(fields: [userId], references: [id])
+
+  createdAt     DateTime        @default(now())
+
+  @@index([trackId])
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+  @@index([status])
+  // Composite indexes for common queries
+  @@index([userId, status, createdAt])
+  @@index([trackId, status, createdAt])
+  @@index([userId, type, createdAt])
+}
+
+enum TransactionType {
+  BUY
+  SELL
+  TRANSFER
+  ROYALTY_CLAIM
+  DEPOSIT
+  WITHDRAWAL
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  PIX
+  CREDIT_CARD
+  CRYPTO
+  BALANCE
+}
+
+// ====== PORTFOLIO ======
+
+model Portfolio {
+  id            String    @id @default(cuid())
+
+  userId        String
+  trackId       String
+
+  // Holdings
+  amount        Int       // number of tokens
+  avgBuyPrice   Float     // average purchase price
+  totalInvested Float     // total money spent
+  currentValue  Float     // current market value
+  unrealizedPnL Float     // profit/loss
+
+  // Royalties
+  totalRoyaltiesEarned Float @default(0)
+  unclaimedRoyalties   Float @default(0)
+
+  // Relations
+  user          User      @relation(fields: [userId], references: [id])
+  track         Track     @relation(fields: [trackId], references: [id])
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([userId, trackId])
+  @@index([userId])
+  @@index([trackId])
+  // Composite index for sorting portfolio
+  @@index([userId, updatedAt])
+  @@index([userId, unrealizedPnL])
+}
+
+// ====== PRICE HISTORY ======
+
+model PriceHistory {
+  id        String   @id @default(cuid())
+
+  trackId   String
+  price     Float
+  volume    Float
+  timestamp DateTime @default(now())
+
+  track     Track    @relation(fields: [trackId], references: [id])
+
+  @@index([trackId, timestamp])
+}
+
+// ====== FAVORITES ======
+
+model Favorite {
+  id        String       @id @default(cuid())
+  userId    String
+  trackId   String
+  type      FavoriteType @default(FAVORITE) // FAVORITE or WATCHLIST
+
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  track     Track        @relation(fields: [trackId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime     @default(now())
+
+  @@unique([userId, trackId, type]) // User can favorite AND watchlist same track
+  @@index([userId, type])
+  @@index([trackId])
+}
+
+enum FavoriteType {
+  FAVORITE
+  WATCHLIST
+}
+
+// ====== COMMENTS/SOCIAL ======
+
+model Comment {
+  id        String   @id @default(cuid())
+
+  userId    String
+  trackId   String
+  content   String
+  likes     Int      @default(0)
+
+  // Replies support (Sprint 38)
+  parentId  String?
+  mentions  String[]  @default([])
+
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  track         Track          @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  commentLikes  CommentLike[]
+  notifications Notification[]
+
+  // Self-referencing relations for replies
+  parent   Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies  Comment[] @relation("CommentReplies")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([trackId])
+  @@index([userId])
+  @@index([createdAt])
+  @@index([parentId])
+  // Composite indexes for loading comments
+  @@index([trackId, createdAt])
+  @@index([userId, createdAt])
+  @@index([trackId, parentId, createdAt])
+}
+
+model CommentLike {
+  id        String   @id @default(cuid())
+
+  userId    String
+  commentId String
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, commentId])
+  @@index([commentId])
+  @@index([userId])
+}
+
+// ====== ANALYTICS ======
+
+model DailyStats {
+  id              String   @id @default(cuid())
+  date            DateTime @unique
+
+  // Platform-wide
+  totalUsers      Int
+  activeUsers     Int
+  newUsers        Int
+
+  totalTracks     Int
+  newTracks       Int
+
+  totalVolume     Float
+  totalTransactions Int
+
+  // Revenue
+  platformFees    Float
+
+  createdAt       DateTime @default(now())
+
+  @@index([date])
+}
+
+// ====== ROYALTY PAYMENTS ======
+
+model RoyaltyPayment {
+  id              String   @id @default(cuid())
+
+  trackId         String
+  totalAmount     Float
+  month           DateTime
+
+  // Distribution status
+  distributed     Boolean  @default(false)
+  distributedAt   DateTime?
+
+  createdAt       DateTime @default(now())
+
+  @@unique([trackId, month])
+  @@index([trackId])
+  @@index([month])
+}
+
+// ====== PRICE ALERTS ======
+
+model PriceAlert {
+  id              String   @id @default(cuid())
+
+  userId          String
+  trackId         String
+
+  // Alert conditions
+  targetPrice     Float     // Price to trigger alert
+  condition       AlertCondition  // ABOVE or BELOW
+  percentChange   Float?    // Optional: alert when % change
+
+  // Status
+  isActive        Boolean   @default(true)
+  triggered       Boolean   @default(false)
+  triggeredAt     DateTime?
+  lastChecked     DateTime?
+
+  // Notification preferences
+  notifyEmail     Boolean   @default(true)
+  notifyPush      Boolean   @default(true)
+
+  // Relations
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  track           Track     @relation(fields: [trackId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([trackId])
+  @@index([isActive, triggered])
+}
+
+enum AlertCondition {
+  ABOVE
+  BELOW
+}
+
+// ====== LIMIT ORDERS ======
+
+model LimitOrder {
+  id              String          @id @default(cuid())
+
+  userId          String
+  trackId         String
+
+  // Order details
+  orderType       OrderType       // BUY or SELL
+  targetPrice     Float           // Price to execute at
+  amount          Int             // Number of tokens
+
+  // Status
+  status          OrderStatus     @default(PENDING)
+  expiresAt       DateTime?       // Optional expiration
+  executedAt      DateTime?
+  cancelledAt     DateTime?
+
+  // Execution details
+  executedPrice   Float?          // Actual execution price
+  executedAmount  Int?            // Actual executed amount
+  transactionId   String?         // Link to created transaction
+
+  // Relations
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  track           Track           @relation(fields: [trackId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([userId])
+  @@index([trackId])
+  @@index([status])
+  @@index([targetPrice])
+  @@index([expiresAt])
+}
+
+enum OrderType {
+  BUY
+  SELL
+}
+
+enum OrderStatus {
+  PENDING       // Waiting for price condition
+  EXECUTED      // Successfully executed
+  CANCELLED     // Cancelled by user
+  EXPIRED       // Expired before execution
+  FAILED        // Execution failed
+}
+
+// ====== REFERRALS ======
+
+model Referral {
+  id                String          @id @default(cuid())
+
+  referrerId        String          // User who referred
+  refereeId         String          // User who was referred
+
+  // Referral code used
+  code              String
+
+  // Status and rewards
+  status            ReferralStatus  @default(PENDING)
+  referrerReward    Float           @default(0)  // Reward for referrer
+  refereeReward     Float           @default(0)  // Reward for referee
+
+  // Completion tracking
+  completedAt       DateTime?       // When referee completed qualifying action
+  rewardPaidAt      DateTime?       // When rewards were credited
+
+  // Relations
+  referrer          User            @relation("ReferrerReferrals", fields: [referrerId], references: [id], onDelete: Cascade)
+  referee           User            @relation("RefereeReferrals", fields: [refereeId], references: [id], onDelete: Cascade)
+
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@unique([referrerId, refereeId])
+  @@index([referrerId])
+  @@index([refereeId])
+  @@index([status])
+  @@index([code])
+}
+
+enum ReferralStatus {
+  PENDING       // Referee signed up, but hasn't qualified yet
+  COMPLETED     // Referee completed qualifying action (e.g., first investment)
+  REWARDED      // Both users received rewards
+  CANCELLED     // Referral cancelled (e.g., fraud detection)
+}
+
+// ====== NOTIFICATIONS ======
+
+model Notification {
+  id              String           @id @default(cuid())
+  userId          String
+  type            NotificationType
+  title           String
+  message         String
+
+  // Optional links/references
+  link            String?
+  trackId         String?
+  commentId       String?
+  referralId      String?
+
+  // Metadata
+  data            Json?
+
+  // Status
+  read            Boolean          @default(false)
+  readAt          DateTime?
+
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comment         Comment?         @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  createdAt       DateTime         @default(now())
+
+  @@index([userId, read])
+  @@index([userId, createdAt])
+  @@index([type])
+}
+
+enum NotificationType {
+  // Investments
+  INVESTMENT_CONFIRMED
+  ROYALTY_RECEIVED
+  PRICE_ALERT
+
+  // Social
+  COMMENT_LIKE
+  COMMENT_REPLY
+  COMMENT_MENTION
+  NEW_FOLLOWER
+
+  // Tracks
+  NEW_TRACK_RELEASE
+  TRACK_MILESTONE
+
+  // Referrals
+  REFERRAL_SIGNUP
+  REFERRAL_COMPLETED
+  REFERRAL_REWARD
+
+  // System
+  KYC_APPROVED
+  KYC_REJECTED
+  WITHDRAWAL_COMPLETED
+  GENERAL
+}
+
+// ====== FOLLOWING SYSTEM ======
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String   // User who is following
+  followingId String   // User being followed
+
+  follower    User     @relation("UserFollowing", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation("UserFollowers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
+  // Composite index for follower lists with date
+  @@index([followingId, createdAt])
+}
+
+// ====== LEADERBOARD & GAMIFICATION ======
+
+model UserStats {
+  id                    String   @id @default(cuid())
+  userId                String   @unique
+
+  // Investment stats
+  totalPoints           Int      @default(0)
+  totalInvested         Float    @default(0)
+  totalProfit           Float    @default(0)
+  totalLoss             Float    @default(0)
+  portfolioValue        Float    @default(0)
+  portfolioDiversity    Float    @default(0)
+  largestHolding        Float    @default(0)
+  totalRoyaltiesEarned  Float    @default(0)
+  monthlyRoyalties      Float    @default(0)
+
+  // Social stats
+  followersCount        Int      @default(0)
+  followingCount        Int      @default(0)
+  commentsCount         Int      @default(0)
+  likesReceived         Int      @default(0)
+  achievementsUnlocked  Int      @default(0)
+
+  // Trading stats
+  winRate               Float    @default(0)
+  totalTrades           Int      @default(0)
+  profitableTrades      Int      @default(0)
+
+  // Streaks / engagement
+  loginStreak           Int      @default(0)
+  longestStreak         Int      @default(0)
+  lastLoginDate         DateTime?
+  daysActive            Int      @default(0)
+
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([totalPoints])
+  @@index([totalInvested])
+  @@index([totalProfit])
+  @@index([portfolioValue])
+  @@index([totalRoyaltiesEarned])
+  @@index([followersCount])
+  // Composite indexes for leaderboard sorting
+  @@index([totalProfit, totalPoints])
+  @@index([portfolioValue, totalProfit])
+  @@index([winRate, totalTrades])
+}
+
+model Achievement {
+  id          String          @id @default(cuid())
+  userId      String
+
+  // Achievement details
+  type        AchievementType
+  tier        AchievementTier @default(BRONZE)
+  title       String
+  description String
+  points      Int             @default(0)
+  icon        String?
+
+  // Status
+  unlocked    Boolean         @default(false)
+  unlockedAt  DateTime?
+  progress    Int             @default(0)  // Current progress
+  target      Int             @default(100) // Target to unlock
+
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([userId])
+  @@index([type])
+  @@index([unlocked])
+  // Composite indexes for achievement queries
+  @@index([userId, unlocked])
+  @@index([userId, type, unlocked])
+}
+
+enum AchievementType {
+  INVESTMENT            // Investment-related achievements
+  TRADING               // Trading performance
+  SOCIAL                // Social interactions
+  PORTFOLIO             // Portfolio milestones
+  ROYALTY               // Royalty earnings
+  DISCOVERY             // Discovery and exploration
+  FIRST_INVESTMENT      // First investment milestone
+  TOTAL_INVESTED        // Total amount invested
+  PROFIT_EARNED         // Profit milestones
+  TOTAL_TRADES          // Number of trades
+  PORTFOLIO_DIVERSITY   // Diversity milestones
+  FOLLOWERS_COUNT       // Social followers milestone
+  LOGIN_STREAK          // Consecutive login days
+  ROYALTIES_EARNED      // Royalty earnings milestones
+  WHALE                 // High portfolio value
+  EARLY_ADOPTER         // Early platform adopter
+  DIAMOND_HANDS         // Long-term holding
+}
+
+enum AchievementTier {
+  BRONZE
+  SILVER
+  GOLD
+  PLATINUM
+  DIAMOND
+}
+
+// ====== COPY TRADING ======
+
+model CopyTrade {
+  id              String          @id @default(cuid())
+
+  // Who is copying whom
+  copierId        String          // User who is copying
+  traderId        String          // User being copied (the trader)
+
+  // Settings
+  isActive        Boolean         @default(true)
+  allocationPercent Float         @default(10)    // % of copier's balance to allocate
+  maxPerTrade     Float?                           // Max amount per trade
+  copyBuys        Boolean         @default(true)  // Copy buy trades
+  copySells       Boolean         @default(true)  // Copy sell trades
+
+  // Stats
+  totalCopied     Int             @default(0)     // Number of trades copied
+  totalInvested   Float           @default(0)     // Total amount invested via copy
+  totalProfit     Float           @default(0)     // Total profit/loss from copying
+
+  // Timestamps
+  startedAt       DateTime        @default(now())
+  pausedAt        DateTime?
+  stoppedAt       DateTime?
+
+  copier          User            @relation("CopierRelation", fields: [copierId], references: [id], onDelete: Cascade)
+  trader          User            @relation("TraderRelation", fields: [traderId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@unique([copierId, traderId])
+  @@index([copierId])
+  @@index([traderId])
+  @@index([isActive])
+}
+
+// Record of each copied trade
+model CopyTradeExecution {
+  id              String          @id @default(cuid())
+
+  copyTradeId     String
+  originalTxId    String          // Original transaction from trader
+  copiedTxId      String?         // Resulting transaction for copier
+
+  // Trade details
+  trackId         String
+  tradeType       TransactionType
+  amount          Int             // Tokens copied
+  price           Float           // Price at execution
+  totalValue      Float
+
+  // Status
+  status          CopyTradeStatus @default(PENDING)
+  failureReason   String?
+
+  createdAt       DateTime        @default(now())
+
+  @@index([copyTradeId])
+  @@index([originalTxId])
+  @@index([status])
+}
+
+enum CopyTradeStatus {
+  PENDING         // Waiting to execute
+  EXECUTED        // Successfully copied
+  SKIPPED         // Skipped (settings, insufficient funds, etc)
+  FAILED          // Failed to execute
+}
+
+// ====== DEVELOPER API ======
+
+model ApiKey {
+  id              String          @id @default(cuid())
+  
+  // Owner
+  userId          String
+  
+  // Key details
+  key             String          @unique      // The actual API key (hashed)
+  name            String                       // User-friendly name
+  prefix          String                       // First 8 chars for display (e.g., "sk_live_12345678...")
+  
+  // Permissions
+  permissions     ApiPermission[] @default([READ_ONLY])
+  
+  // Usage tracking
+  requestsCount   Int             @default(0)  // Total requests made
+  lastUsedAt      DateTime?
+  
+  // Rate limiting
+  rateLimit       Int             @default(1000) // Requests per hour
+  
+  // Status
+  status          ApiKeyStatus    @default(ACTIVE)
+  expiresAt       DateTime?                    // Optional expiration
+  
+  // Metadata
+  ipWhitelist     String[]        @default([]) // Optional IP restrictions
+  environment     ApiEnvironment  @default(PRODUCTION)
+  
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  
+  @@index([userId])
+  @@index([key])
+  @@index([status])
+}
+
+enum ApiPermission {
+  READ_ONLY       // Can only read data (GET endpoints)
+  WRITE           // Can create/update data (POST, PUT, PATCH)
+  TRADE           // Can execute trades
+  FULL_ACCESS     // Full access to all endpoints
+}
+
+enum ApiKeyStatus {
+  ACTIVE
+  INACTIVE
+  REVOKED
+  EXPIRED
+}
+
+enum ApiEnvironment {
+  PRODUCTION
+  SANDBOX
+}

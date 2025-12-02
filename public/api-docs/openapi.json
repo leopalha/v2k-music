@@ -1,0 +1,358 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "V2K Music API",
+    "description": "Public API for V2K Music - Invest in Music Royalties Platform. Access track data, portfolio information, and trading functionality programmatically.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "V2K Music Support",
+      "url": "https://v2k-music.vercel.app",
+      "email": "support@v2kmusic.com"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://v2k-music.vercel.app/api/v1",
+      "description": "Production server"
+    },
+    {
+      "url": "http://localhost:5000/api/v1",
+      "description": "Development server"
+    }
+  ],
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "API Key",
+        "description": "Enter your API key with 'Bearer ' prefix (e.g., 'Bearer sk_live_...')"
+      }
+    },
+    "schemas": {
+      "Track": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique track identifier"
+          },
+          "title": {
+            "type": "string",
+            "description": "Track title"
+          },
+          "artistName": {
+            "type": "string",
+            "description": "Artist name"
+          },
+          "genre": {
+            "type": "string",
+            "enum": ["TRAP", "FUNK", "RAP", "RNB", "REGGAETON", "POP", "ELECTRONIC", "ROCK", "OTHER"],
+            "description": "Music genre"
+          },
+          "coverUrl": {
+            "type": "string",
+            "description": "Cover image URL"
+          },
+          "audioUrl": {
+            "type": "string",
+            "description": "Audio preview URL"
+          },
+          "currentPrice": {
+            "type": "number",
+            "format": "float",
+            "description": "Current price per token"
+          },
+          "priceChange24h": {
+            "type": "number",
+            "format": "float",
+            "description": "24h price change percentage"
+          },
+          "volume24h": {
+            "type": "number",
+            "format": "float",
+            "description": "24h trading volume"
+          },
+          "holders": {
+            "type": "integer",
+            "description": "Number of token holders"
+          },
+          "totalSupply": {
+            "type": "integer",
+            "description": "Total token supply"
+          },
+          "availableSupply": {
+            "type": "integer",
+            "description": "Available tokens for trading"
+          },
+          "marketCap": {
+            "type": "number",
+            "format": "float",
+            "description": "Market capitalization"
+          },
+          "totalStreams": {
+            "type": "integer",
+            "description": "Total streams across platforms"
+          },
+          "spotifyStreams": {
+            "type": "integer",
+            "description": "Spotify streams"
+          },
+          "aiScore": {
+            "type": "integer",
+            "description": "AI score (0-100)"
+          },
+          "predictedROI": {
+            "type": "number",
+            "format": "float",
+            "nullable": true,
+            "description": "Predicted ROI percentage"
+          },
+          "viralProbability": {
+            "type": "number",
+            "format": "float",
+            "nullable": true,
+            "description": "Viral probability (0-1)"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+          }
+        }
+      },
+      "PaginatedTracks": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Track"
+            }
+          },
+          "meta": {
+            "type": "object",
+            "properties": {
+              "page": {
+                "type": "integer"
+              },
+              "limit": {
+                "type": "integer"
+              },
+              "totalCount": {
+                "type": "integer"
+              },
+              "totalPages": {
+                "type": "integer"
+              },
+              "hasNext": {
+                "type": "boolean"
+              },
+              "hasPrev": {
+                "type": "boolean"
+              }
+            }
+          },
+          "environment": {
+            "type": "string",
+            "enum": ["PRODUCTION", "SANDBOX"]
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message"
+          },
+          "message": {
+            "type": "string",
+            "description": "Detailed error description"
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/tracks": {
+      "get": {
+        "summary": "List tracks",
+        "description": "Get a paginated list of all active tracks with optional filters and sorting",
+        "operationId": "getTracks",
+        "tags": ["Tracks"],
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Items per page",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "genre",
+            "in": "query",
+            "description": "Filter by genre",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["TRAP", "FUNK", "RAP", "RNB", "REGGAETON", "POP", "ELECTRONIC", "ROCK", "OTHER"]
+            }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "description": "Sort field",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["price", "volume24h", "priceChange24h", "createdAt"],
+              "default": "createdAt"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "description": "Sort order",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["asc", "desc"],
+              "default": "desc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedTracks"
+                },
+                "example": {
+                  "success": true,
+                  "data": [
+                    {
+                      "id": "clxxx123456",
+                      "title": "Midnight Dreams",
+                      "artistName": "Luna Star",
+                      "genre": "TRAP",
+                      "currentPrice": 1.25,
+                      "priceChange24h": 5.2,
+                      "volume24h": 15000,
+                      "holders": 450,
+                      "aiScore": 75,
+                      "predictedROI": 18.5,
+                      "viralProbability": 0.65
+                    }
+                  ],
+                  "meta": {
+                    "page": 1,
+                    "limit": 20,
+                    "totalCount": 150,
+                    "totalPages": 8,
+                    "hasNext": true,
+                    "hasPrev": false
+                  },
+                  "environment": "PRODUCTION"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Missing or invalid API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "success": false,
+                  "error": "Invalid API key",
+                  "message": "The provided API key is invalid, expired, or revoked"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "success": false,
+                  "error": "Rate limit exceeded",
+                  "message": "You have exceeded the rate limit of 1000 requests per hour"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Tracks",
+      "description": "Operations related to music tracks"
+    },
+    {
+      "name": "Portfolio",
+      "description": "Operations related to user portfolios"
+    },
+    {
+      "name": "Trading",
+      "description": "Operations related to trading"
+    }
+  ]
+}

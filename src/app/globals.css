@@ -1,0 +1,285 @@
+@import "tailwindcss";
+
+/* ===========================================
+   V2K DESIGN SYSTEM - TAILWIND v4
+   Theme: Dark (Spotify meets Bloomberg)
+   =========================================== */
+
+:root {
+  /* Primary - Electric Blue (connection, technology) */
+  --color-primary-50: #E6F0FF;
+  --color-primary-100: #B3D7FF;
+  --color-primary-200: #80BDFF;
+  --color-primary-300: #4DA3FF;
+  --color-primary-400: #1A89FF;
+  --color-primary-500: #0070E0;
+  --color-primary-600: #0056AD;
+  --color-primary-700: #003D7A;
+  --color-primary-800: #002347;
+  --color-primary-900: #000A14;
+
+  /* Secondary - Vibrant Purple (creativity, music) */
+  --color-secondary-50: #F3E6FF;
+  --color-secondary-100: #D9B3FF;
+  --color-secondary-200: #BF80FF;
+  --color-secondary-300: #A64DFF;
+  --color-secondary-400: #8C1AFF;
+  --color-secondary-500: #7000E0;
+  --color-secondary-600: #5600AD;
+  --color-secondary-700: #3D007A;
+  --color-secondary-800: #230047;
+  --color-secondary-900: #0A0014;
+
+  /* Accent - Hot Pink (energy, passion) */
+  --color-accent-50: #FFE6F5;
+  --color-accent-100: #FFB3E0;
+  --color-accent-200: #FF80CC;
+  --color-accent-300: #FF4DB8;
+  --color-accent-400: #FF1AA3;
+  --color-accent-500: #E00089;
+  --color-accent-600: #AD006B;
+  --color-accent-700: #7A004D;
+  --color-accent-800: #47002E;
+  --color-accent-900: #14000F;
+
+  /* Background shades (Dark Theme) */
+  --color-bg-primary: #0A0A0A;
+  --color-bg-secondary: #141414;
+  --color-bg-tertiary: #1E1E1E;
+  --color-bg-elevated: #282828;
+
+  /* Text shades */
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #B3B3B3;
+  --color-text-tertiary: #737373;
+  --color-text-disabled: #404040;
+
+  /* Border shades */
+  --color-border-subtle: #1E1E1E;
+  --color-border-default: #282828;
+  --color-border-strong: #404040;
+
+  /* Semantic colors */
+  --color-success: #22C55E;
+  --color-success-light: #4ADE80;
+  --color-success-dark: #16A34A;
+  --color-error: #EF4444;
+  --color-error-light: #F87171;
+  --color-error-dark: #DC2626;
+  --color-warning: #F59E0B;
+  --color-warning-light: #FBBF24;
+  --color-warning-dark: #D97706;
+  --color-info: #3B82F6;
+  --color-info-light: #60A5FA;
+  --color-info-dark: #2563EB;
+
+  /* Animation durations */
+  --duration-fast: 150ms;
+  --duration-base: 200ms;
+  --duration-medium: 300ms;
+  --duration-slow: 500ms;
+
+  /* Easing */
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Theme inline for Tailwind v4 */
+@theme inline {
+  /* Colors */
+  --color-primary-50: var(--color-primary-50);
+  --color-primary-100: var(--color-primary-100);
+  --color-primary-200: var(--color-primary-200);
+  --color-primary-300: var(--color-primary-300);
+  --color-primary-400: var(--color-primary-400);
+  --color-primary-500: var(--color-primary-500);
+  --color-primary-600: var(--color-primary-600);
+  --color-primary-700: var(--color-primary-700);
+  --color-primary-800: var(--color-primary-800);
+  --color-primary-900: var(--color-primary-900);
+
+  --color-secondary-50: var(--color-secondary-50);
+  --color-secondary-100: var(--color-secondary-100);
+  --color-secondary-200: var(--color-secondary-200);
+  --color-secondary-300: var(--color-secondary-300);
+  --color-secondary-400: var(--color-secondary-400);
+  --color-secondary-500: var(--color-secondary-500);
+  --color-secondary-600: var(--color-secondary-600);
+  --color-secondary-700: var(--color-secondary-700);
+  --color-secondary-800: var(--color-secondary-800);
+  --color-secondary-900: var(--color-secondary-900);
+
+  --color-accent-50: var(--color-accent-50);
+  --color-accent-100: var(--color-accent-100);
+  --color-accent-200: var(--color-accent-200);
+  --color-accent-300: var(--color-accent-300);
+  --color-accent-400: var(--color-accent-400);
+  --color-accent-500: var(--color-accent-500);
+  --color-accent-600: var(--color-accent-600);
+  --color-accent-700: var(--color-accent-700);
+  --color-accent-800: var(--color-accent-800);
+  --color-accent-900: var(--color-accent-900);
+
+  --color-bg-primary: var(--color-bg-primary);
+  --color-bg-secondary: var(--color-bg-secondary);
+  --color-bg-tertiary: var(--color-bg-tertiary);
+  --color-bg-elevated: var(--color-bg-elevated);
+
+  --color-text-primary: var(--color-text-primary);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-tertiary: var(--color-text-tertiary);
+  --color-text-disabled: var(--color-text-disabled);
+
+  --color-border-subtle: var(--color-border-subtle);
+  --color-border-default: var(--color-border-default);
+  --color-border-strong: var(--color-border-strong);
+
+  --color-success: var(--color-success);
+  --color-success-light: var(--color-success-light);
+  --color-success-dark: var(--color-success-dark);
+  --color-error: var(--color-error);
+  --color-error-light: var(--color-error-light);
+  --color-error-dark: var(--color-error-dark);
+  --color-warning: var(--color-warning);
+  --color-warning-light: var(--color-warning-light);
+  --color-warning-dark: var(--color-warning-dark);
+  --color-info: var(--color-info);
+  --color-info-light: var(--color-info-light);
+  --color-info-dark: var(--color-info-dark);
+
+  /* Fonts */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-jakarta), var(--font-inter), ui-sans-serif, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+
+  /* Shadows */
+  --shadow-glow-primary: 0 0 20px rgba(26, 137, 255, 0.5);
+  --shadow-glow-secondary: 0 0 20px rgba(140, 26, 255, 0.5);
+  --shadow-glow-accent: 0 0 20px rgba(255, 26, 163, 0.5);
+
+  /* Border radius */
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 2rem;
+}
+
+/* Base styles */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Selection */
+::selection {
+  background-color: var(--color-primary-400);
+  color: white;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-default);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-strong);
+}
+
+/* Utility classes */
+.gradient-hero {
+  background: linear-gradient(135deg, #1A89FF 0%, #8C1AFF 50%, #FF1AA3 100%);
+}
+
+.gradient-card {
+  background: linear-gradient(
+    to bottom,
+    rgba(26, 137, 255, 0.1) 0%,
+    rgba(140, 26, 255, 0.05) 100%
+  );
+}
+
+.gradient-mesh {
+  background:
+    radial-gradient(at 20% 30%, rgba(26, 137, 255, 0.2) 0%, transparent 50%),
+    radial-gradient(at 80% 70%, rgba(140, 26, 255, 0.2) 0%, transparent 50%),
+    radial-gradient(at 50% 50%, rgba(255, 26, 163, 0.2) 0%, transparent 50%),
+    var(--color-bg-primary);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #1A89FF 0%, #8C1AFF 50%, #FF1AA3 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(26, 137, 255, 0.5); }
+  50% { box-shadow: 0 0 40px rgba(26, 137, 255, 0.8); }
+}
+
+.animate-fade-in {
+  animation: fadeIn var(--duration-medium) var(--ease-out);
+}
+
+.animate-slide-up {
+  animation: slideUp var(--duration-medium) var(--ease-out);
+}
+
+.animate-scale-in {
+  animation: scaleIn var(--duration-base) var(--ease-out);
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Glass effect */
+.glass {
+  background: rgba(20, 20, 20, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Focus ring */
+.focus-ring {
+  outline: none;
+}
+
+.focus-ring:focus-visible {
+  outline: 2px solid var(--color-primary-400);
+  outline-offset: 2px;
+}
