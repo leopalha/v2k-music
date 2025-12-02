@@ -17,6 +17,17 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      // Don't bundle Prisma Client on the client side
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        '@prisma/client': false,
+        '.prisma/client': false,
+      };
+    }
+    return config;
+  },
 };
 
 export default nextConfig;

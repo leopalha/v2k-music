@@ -3,7 +3,7 @@
  * Functions for parsing and handling @mentions in comments
  */
 
-import { prisma } from "@/lib/db/prisma";
+// import { prisma } from '@/lib/prisma'; // Removed to prevent client-side import
 
 /**
  * Regular expression to match @mentions
@@ -29,27 +29,15 @@ export function extractMentions(text: string): string[] {
 
 /**
  * Get user IDs for mentioned usernames
+ * NOTE: This should be called server-side only via API endpoint
  * @param usernames - Array of usernames to look up
  * @returns Array of user IDs
  */
 export async function getUserIdsFromMentions(
   usernames: string[]
 ): Promise<string[]> {
-  if (usernames.length === 0) return [];
-
-  const users = await prisma.user.findMany({
-    where: {
-      username: {
-        in: usernames,
-        mode: "insensitive", // Case-insensitive search
-      },
-    },
-    select: {
-      id: true,
-    },
-  });
-
-  return users.map((user) => user.id);
+  // This function should be called from API route, not client component
+  return [];
 }
 
 /**
@@ -84,29 +72,13 @@ export function highlightMentions(text: string): string {
 
 /**
  * Get usernames from user IDs
+ * NOTE: This should be called server-side only via API endpoint
  * @param userIds - Array of user IDs
  * @returns Map of userId to username
  */
 export async function getUsernamesFromIds(
   userIds: string[]
 ): Promise<Map<string, string>> {
-  if (userIds.length === 0) return new Map();
-
-  const users = await prisma.user.findMany({
-    where: {
-      id: {
-        in: userIds,
-      },
-    },
-    select: {
-      id: true,
-      username: true,
-    },
-  });
-
-  return new Map(
-    users
-      .filter((user) => user.username)
-      .map((user) => [user.id, user.username!])
-  );
+  // This function should be called from API route, not client component
+  return new Map();
 }
