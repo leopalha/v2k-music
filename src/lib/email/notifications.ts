@@ -1,3 +1,4 @@
+import 'server-only';
 import { Resend } from 'resend';
 
 const resend = process.env.RESEND_API_KEY 
