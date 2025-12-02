@@ -321,11 +321,13 @@ export default function InvestmentModal({
             <div>
               {/* Track Info */}
               <div className="flex items-center gap-4 p-4 rounded-xl bg-bg-elevated mb-6">
-                <img
-                  src={track.coverUrl}
-                  alt={track.title}
-                  className="w-16 h-16 rounded-lg object-cover"
-                />
+                {track.coverUrl && (
+                  <img
+                    src={track.coverUrl}
+                    alt={track.title}
+                    className="w-16 h-16 rounded-lg object-cover"
+                  />
+                )}
                 <div>
                   <h4 className="font-semibold text-text-primary">
                     {track.title}
