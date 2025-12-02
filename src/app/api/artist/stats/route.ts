@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
         status: true,
         totalSupply: true,
         availableSupply: true,
-        pricePerToken: true,
+        currentPrice: true,
         totalStreams: true,
         monthlyRoyalty: true,
         createdAt: true,
@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
     // Calculate earnings from token sales
     const tokenSalesEarnings = tracks.reduce((sum, track) => {
       const tokensSold = track.totalSupply - track.availableSupply;
-      return sum + (tokensSold * track.pricePerToken);
+      return sum + (tokensSold * track.currentPrice);
     }, 0);
 
     // Calculate monthly royalties (last 30 days)
@@ -71,11 +71,11 @@ export async function GET(request: NextRequest) {
         },
       },
       _sum: {
-        amountBRL: true,
+        totalValue: true,
       },
     });
 
-    const monthlyEarnings = recentRoyalties._sum.amountBRL || 0;
+    const monthlyEarnings = recentRoyalties._sum.totalValue || 0;
     const totalEarnings = tokenSalesEarnings + monthlyEarnings;
 
     // Calculate total royalties paid to investors
@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
         },
       },
       _sum: {
-        amountBRL: true,
+        totalValue: true,
       },
     });
 
@@ -98,7 +98,7 @@ export async function GET(request: NextRequest) {
       totalInvestors,
       tracksListed,
       pendingTracks,
-      totalRoyaltiesPaid: Math.round((totalRoyaltiesPaid._sum.amountBRL || 0) * 100) / 100,
+      totalRoyaltiesPaid: Math.round((totalRoyaltiesPaid._sum.totalValue || 0) * 100) / 100,
     };
 
     return NextResponse.json(stats);

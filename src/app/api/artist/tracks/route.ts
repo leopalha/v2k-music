@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
         status: true,
         totalSupply: true,
         availableSupply: true,
-        pricePerToken: true,
+        currentPrice: true,
         totalStreams: true,
         monthlyRoyalty: true,
         createdAt: true,
@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
     // Transform data to match expected format
     const transformedTracks = tracks.map(track => {
       const tokensSold = track.totalSupply - track.availableSupply;
-      const totalRaised = tokensSold * track.pricePerToken;
+      const totalRaised = tokensSold * track.currentPrice;
       const uniqueHolders = new Set(track.portfolio.map(p => p.userId)).size;
 
       return {
@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
           total: track.totalSupply,
           sold: tokensSold,
           available: track.availableSupply,
-          pricePerToken: track.pricePerToken,
+          pricePerToken: track.currentPrice,
         },
         earnings: {
           totalRaised: Math.round(totalRaised * 100) / 100,

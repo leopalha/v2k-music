@@ -4,12 +4,6 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db/prisma';
 import { uploadAudio, uploadImage, validateAudioFile, validateImageFile } from '@/lib/upload/storage';
 
-export const config = {
-  api: {
-    bodyParser: false, // Disable body parsing for file uploads
-  },
-};
-
 export async function POST(request: NextRequest) {
   try {
     // Check authentication
@@ -28,9 +22,9 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     
     const title = formData.get('title') as string;
+    const artistName = formData.get('artistName') as string || session.user.name || 'Unknown';
     const genre = formData.get('genre') as string;
-    const description = formData.get('description') as string || '';
-    const pricePerToken = parseFloat(formData.get('pricePerToken') as string);
+    const currentPrice = parseFloat(formData.get('pricePerToken') as string);
     const totalSupply = parseInt(formData.get('totalSupply') as string);
     const audioFile = formData.get('audio') as File;
     const coverFile = formData.get('cover') as File;
@@ -52,7 +46,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate price
-    if (isNaN(pricePerToken) || pricePerToken < 0.01 || pricePerToken > 100) {
+    if (isNaN(currentPrice) || currentPrice < 0.01 || currentPrice > 100) {
       return NextResponse.json(
         { error: 'Preço inválido (mín: R$ 0.01, máx: R$ 100)' },
         { status: 400 }
@@ -114,33 +108,21 @@ export async function POST(request: NextRequest) {
     const track = await prisma.track.create({
       data: {
         title,
+        artistName,
         artistId: userId,
         genre: genre as any, // TODO: validate against Genre enum
-        description,
         coverUrl,
         audioUrl,
-        previewUrl: audioUrl, // Same as audio for now
-        pricePerToken,
+        duration: duration || 0,
+        currentPrice,
+        initialPrice: currentPrice,
         totalSupply,
         availableSupply: totalSupply,
+        marketCap: currentPrice * totalSupply,
         status: 'PENDING',
-        duration: duration || 0,
-        totalStreams: 0,
-        spotifyStreams: 0,
-        youtubeViews: 0,
-        tiktokViews: 0,
-        totalRoyalties: 0,
-        monthlyRoyalty: 0,
-        avgRoyaltyPerToken: 0,
-        riskLevel: 'MEDIUM',
         aiScore: 50, // Default score
-        predictedROI: 0,
-        viralProbability: 0,
-        isActive: true,
-        isFeatured: false,
-        marketCap: 0,
-        volume24h: 0,
-        priceChange24h: 0,
+        predictedROI: 0.05, // 5% default
+        viralProbability: 0.5, // 50% default
       },
     });
 
