@@ -322,9 +322,11 @@ export default function ArtistDashboardPage() {
                       >
                         <DollarSign className="w-4 h-4" />
                       </Button>
-                      <Button variant="outline" size="sm">
-                        <BarChart3 className="w-4 h-4" />
-                      </Button>
+                      <Link href="/artist/analytics">
+                        <Button variant="outline" size="sm" title="Ver analytics">
+                          <BarChart3 className="w-4 h-4" />
+                        </Button>
+                      </Link>
                       <button className="p-2 hover:bg-bg-tertiary rounded-lg transition-colors">
                         <MoreVertical className="w-5 h-5 text-text-tertiary" />
                       </button>
@@ -401,15 +403,17 @@ export default function ArtistDashboardPage() {
             </div>
           </button>
 
-          <button className="flex items-center gap-4 p-6 bg-bg-secondary rounded-xl border border-border-primary hover:border-primary/50 transition-colors text-left">
-            <div className="p-3 bg-secondary/10 rounded-lg">
-              <BarChart3 className="w-6 h-6 text-secondary" />
-            </div>
-            <div>
-              <p className="font-semibold text-text-primary">Ver Analytics</p>
-              <p className="text-sm text-text-secondary">Métricas detalhadas</p>
-            </div>
-          </button>
+          <Link href="/artist/analytics">
+            <button className="flex items-center gap-4 p-6 bg-bg-secondary rounded-xl border border-border-primary hover:border-primary/50 transition-colors text-left w-full">
+              <div className="p-3 bg-secondary/10 rounded-lg">
+                <BarChart3 className="w-6 h-6 text-secondary" />
+              </div>
+              <div>
+                <p className="font-semibold text-text-primary">Ver Analytics</p>
+                <p className="text-sm text-text-secondary">Métricas detalhadas</p>
+              </div>
+            </button>
+          </Link>
         </div>
       </div>
 
