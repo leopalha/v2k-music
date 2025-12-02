@@ -2432,6 +2432,7 @@ PROGRESSO TOTAL: ~85% do Roadmap de 12 Meses
 
 ### 🎯 FASE 6 - EM ANDAMENTO:
 - ✅ Sprint 61: GraphQL API & SDK Foundation
+- ✅ Sprint 62: Webhooks & Event System
 
 ---
 
@@ -2584,7 +2585,124 @@ const client = new V2KClient({
 
 ---
 
-## 📊 PROGRESSO ATUALIZADO PÓS-SPRINT 61
+## ✅ Sprint 62 - Webhooks & Event System
+
+**Status:** ✅ COMPLETO
+**Data:** 2025-12-02
+**Objetivo:** Sistema de webhooks para notificar sistemas externos sobre eventos da plataforma
+
+### Entregas
+
+#### 1. Prisma Schema
+**Models adicionados:**
+- `Webhook`: Configuração de webhooks (url, secret, events, status)
+- `WebhookDelivery`: Histórico de entregas (payload, response, success, attempt)
+- Relação com User: `webhooks Webhook[]`
+
+#### 2. Webhook Manager (`src/lib/webhooks/manager.ts` - 260 linhas)
+**Funções:**
+- `triggerWebhooks(event, data, userId?)`: Dispara webhooks para evento
+- `signPayload(payload, secret)`: Assina payload com HMAC SHA256
+- `verifySignature(payload, signature, secret)`: Verifica assinatura
+- `retryWebhookDelivery(deliveryId)`: Retry manual
+- `generateWebhookSecret()`: Gera secret seguro (64 chars hex)
+- `testWebhook(webhookId)`: Envia evento de teste
+
+**Features:**
+- Automatic retry: 3 tentativas com exponential backoff (2s, 4s, 8s)
+- Timeout: 10s por entrega
+- Auto-disable: Após 10 falhas consecutivas
+- Headers: X-V2K-Signature, X-V2K-Event, X-V2K-Delivery-Attempt
+- Delivery tracking: statusCode, response, duration, errorMessage
+- Parallel delivery: Promise.allSettled
+
+#### 3. Event Types
+**7 eventos suportados:**
+- `trade.completed`: Trade executado com sucesso
+- `trade.failed`: Trade falhou
+- `alert.triggered`: Price alert disparado
+- `royalty.claimed`: Royalties reivindicados
+- `portfolio.updated`: Portfolio atualizado
+- `user.kyc.approved`: KYC aprovado
+- `user.kyc.rejected`: KYC rejeitado
+
+#### 4. API Endpoints
+**Webhook Management:**
+- `POST /api/webhooks` (107 linhas)
+  - Cria webhook (max 10 por usuário)
+  - Valida URL e eventos
+  - Gera secret automaticamente
+  - Retorna webhook com secret (mostrar uma vez)
+
+- `GET /api/webhooks`
+  - Lista webhooks do usuário
+  - Include: _count deliveries
+  - Ordenado por createdAt desc
+
+- `GET /api/webhooks/[id]` (111 linhas)
+  - Detalhes de webhook específico
+  - Valida ownership
+
+- `PATCH /api/webhooks/[id]`
+  - Atualiza url, events, description, isActive
+  - Valida ownership
+
+- `DELETE /api/webhooks/[id]`
+  - Remove webhook
+  - Cascade delete deliveries
+
+- `POST /api/webhooks/[id]/test` (43 linhas)
+  - Envia evento de teste
+  - Payload: test=true, message, timestamp
+
+### Arquivos Criados
+- `prisma/schema.prisma` (+57 linhas models)
+- `src/lib/webhooks/manager.ts` (260 linhas)
+- `src/app/api/webhooks/route.ts` (107 linhas)
+- `src/app/api/webhooks/[id]/route.ts` (111 linhas)
+- `src/app/api/webhooks/[id]/test/route.ts` (43 linhas)
+- **Total:** 578 linhas
+
+### Features Implementadas
+- ✅ Webhook CRUD completo
+- ✅ HMAC SHA256 signature
+- ✅ Automatic retry com backoff
+- ✅ Timeout protection (10s)
+- ✅ Auto-disable após falhas
+- ✅ Delivery tracking completo
+- ✅ Test endpoint
+- ✅ Event type validation
+- ✅ URL validation
+- ✅ User ownership validation
+- ✅ 10 webhooks limit per user
+
+### Build Status
+- ✅ Build successful (0 errors)
+- ✅ TypeScript completo
+- ✅ Next.js 28.4s compilation
+- ✅ Prisma schema válido
+
+### Commit Info
+- **Hash:** 3853336
+- **Message:** "feat: Sprint 62 - Webhooks & Event System"
+- **Files changed:** 5 files, 575 insertions
+- **Status:** ✅ Committed locally
+
+### Próximos Passos (Webhooks v2)
+- [ ] Integrar com /api/investments/confirm (trade.completed)
+- [ ] Integrar com /api/cron/check-alerts (alert.triggered)
+- [ ] Integrar com /api/portfolio/claim-royalties (royalty.claimed)
+- [ ] Integrar com /api/kyc/complete (user.kyc.approved/rejected)
+- [ ] GET /api/webhooks/[id]/deliveries (logs)
+- [ ] POST /api/webhooks/deliveries/[id]/retry
+- [ ] Admin dashboard /admin/webhooks
+- [ ] Rate limiting (100 deliveries/min per webhook)
+- [ ] Webhook verification endpoint
+- [ ] Batch delivery optimization
+
+---
+
+## 📊 PROGRESSO ATUALIZADO PÓS-SPRINT 62
 
 ```
 FASE 1 (MVP):                 ██████████ 100% ✅
@@ -2592,13 +2710,13 @@ FASE 2 (Core Features):       ██████████ 100% ✅
 FASE 3 (Growth Features):     ██████████ 100% ✅
 FASE 4 (Advanced Features):   ██████████ 100% ✅
 FASE 5 (Scale & Optimization): ██████████ 100% ✅
-FASE 6 (Ecosystem):           ██░░░░░░░░ 20% 🔄 ← EM ANDAMENTO
+FASE 6 (Ecosystem):           ████░░░░░░ 40% 🔄 ← EM ANDAMENTO
 
-PROGRESSO TOTAL: ~87% do Roadmap de 12 Meses
+PROGRESSO TOTAL: ~89% do Roadmap de 12 Meses
 ```
 
-**Última Atualização:** 2025-12-02 (Sprint 61 concluído)
-**Responsável:** Claude (Sprints 49-61 + Deploys)
-**Próximo:** Sprint 62 - continuando FASE 6
-**Status:** 🚀 13 SPRINTS + DEPLOYS! GraphQL API + SDK prontos! (87% do Roadmap)
-**Plataforma:** Production-ready + GraphQL ecosystem
+**Última Atualização:** 2025-12-02 (Sprint 62 concluído)
+**Responsável:** Claude (Sprints 49-62 + Deploys)
+**Próximo:** Sprint 63 - continuando FASE 6
+**Status:** 🚀 14 SPRINTS CONCLUÍDOS! GraphQL + SDK + Webhooks! (89% do Roadmap)
+**Plataforma:** Production-ready + API ecosystem completo
