@@ -2783,7 +2783,7 @@ await sendTradeConfirmationEmail(user, trade, track);
 
 ---
 
-## 📊 PROGRESSO ATUALIZADO PÓS-SPRINT 63
+## 📊 PROGRESSO ATUALIZADO PÓS-SPRINT 64
 
 ```
 FASE 1 (MVP):                 ██████████ 100% ✅
@@ -2791,13 +2791,105 @@ FASE 2 (Core Features):       ██████████ 100% ✅
 FASE 3 (Growth Features):     ██████████ 100% ✅
 FASE 4 (Advanced Features):   ██████████ 100% ✅
 FASE 5 (Scale & Optimization): ██████████ 100% ✅
-FASE 6 (Ecosystem):           ██████░░░░ 60% 🔄 ← EM ANDAMENTO
+FASE 6 (Ecosystem):           ████████░░ 80% 🔄 ← EM ANDAMENTO
 
-PROGRESSO TOTAL: ~91% do Roadmap de 12 Meses
+PROGRESSO TOTAL: ~93% do Roadmap de 12 Meses
 ```
 
-**Última Atualização:** 2025-12-02 (Sprint 63 concluído)
-**Responsável:** Claude (Sprints 49-63 + Deploys)
-**Próximo:** Sprint 64 ou FASE 6 completion
-**Status:** 🎉 15 SPRINTS! GraphQL + Webhooks + Email integrados! (91% do Roadmap)
-**Plataforma:** Production-ready + Event-driven architecture completa
+**Última Atualização:** 2025-12-02 (Sprint 64 concluído)
+**Responsável:** Claude (Sprints 49-64 + Deploys)
+**Próximo:** Sprints 65-66 para 100% completion
+**Status:** 🎉 16 SPRINTS! Widgets & Embeds System ativo! (93% do Roadmap)
+**Plataforma:** Production-ready + Event-driven + Embeddable widgets
+
+---
+
+## ✅ Sprint 64 - Widget & Embeds System
+
+**Status:** ✅ COMPLETO
+**Data:** 2025-12-02
+**Objetivo:** Sistema de widgets embeddable para integração com sites externos
+
+### Entregas
+
+#### 1. Widget Builder Library (`/lib/widgets/builder.ts` - 147 linhas)
+- Gerador de código iframe
+- Configuração: type, width, height, theme, autoplay
+- Validação de config
+- Parse de query params
+- Suporte a 3 tipos de widgets
+
+#### 2. Embed Pages (410 linhas total)
+- `/embed/track/[id]`: Track player standalone (118 linhas)
+- `/embed/portfolio/[slug]`: Portfolio showcase (181 linhas)
+- `/embed/leaderboard`: Top investors widget (111 linhas)
+- Layout limpo sem navbar/sidebar
+- Theme support (light/dark/auto)
+- Powered by V2K footer
+
+#### 3. Developer UI (`/developer/widgets` - 280 linhas)
+- Widget builder interativo
+- Live code generation
+- Copy to clipboard
+- Preview configs
+- Examples para cada tipo
+- Instruções de uso
+
+#### 4. Fixes
+- Remove Prisma imports de `mentions.ts` (client-side safe)
+- Fix User._count.portfolio
+- Fix Track.audioUrl field
+- Fix server-only issues
+
+### Arquivos Criados
+- `src/lib/widgets/builder.ts` (147 linhas)
+- `src/app/embed/track/[id]/page.tsx` (118 linhas)
+- `src/app/embed/portfolio/[slug]/page.tsx` (181 linhas)
+- `src/app/embed/leaderboard/page.tsx` (111 linhas)
+- `src/app/(app)/developer/widgets/page.tsx` (280 linhas)
+- **Total:** 837 linhas
+
+### Arquivos Modificados
+- `src/lib/utils/mentions.ts` (remove Prisma deps)
+
+### Features Implementadas
+- ✅ Widget builder library
+- ✅ 3 tipos de widgets (track, portfolio, leaderboard)
+- ✅ Embed pages sem chrome UI
+- ✅ Developer tool com live preview
+- ✅ Copy code button
+- ✅ Theme customization
+- ✅ Responsive design
+- ✅ Security: client-side safe
+
+### Build Status
+- ✅ Build successful (0 errors)
+- ✅ TypeScript completo
+- ✅ Next.js 35s compilation
+- ✅ Production ready
+
+### Commit Info
+- **Hash:** 86908d3
+- **Message:** "feat: Sprint 64 - Widget & Embeds System"
+- **Files changed:** 10 files, 857 insertions, 35 deletions
+- **Status:** ✅ Committed locally
+
+### Usage Example
+```html
+<iframe
+  src="https://v2k-music.com/embed/track/{trackId}?theme=dark"
+  width="400px"
+  height="500px"
+  frameborder="0"
+  style="border: none; border-radius: 8px;"
+></iframe>
+```
+
+### Próximos Passos (Widgets v2)
+- [ ] Widget analytics (views, plays)
+- [ ] Custom branding options
+- [ ] More widget types (market overview)
+- [ ] oEmbed support
+- [ ] Widget marketplace
+
+---
