@@ -28,6 +28,9 @@ model User {
   username          String?   @unique
   bio               String?
 
+  // Admin
+  role              UserRole  @default(USER)
+
   // KYC
   fullName          String?
   cpf               String?   @unique
@@ -96,6 +99,12 @@ enum KycStatus {
   PENDING
   VERIFIED
   REJECTED
+}
+
+enum UserRole {
+  USER
+  ADMIN
+  SUPER_ADMIN
 }
 
 // ====== MUSIC TRACKS ======
