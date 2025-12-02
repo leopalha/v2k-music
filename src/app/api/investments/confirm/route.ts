@@ -4,6 +4,8 @@ import { authOptions } from '@/lib/auth';
 import { stripe, STRIPE_MOCK_MODE } from '@/lib/stripe/stripe';
 import { prisma } from '@/lib/db/prisma';
 import { randomUUID } from 'crypto';
+import { triggerWebhooks } from '@/lib/webhooks/manager';
+import { sendTradeConfirmationEmail } from '@/lib/email/notifications';
 
 export async function POST(request: Request) {
   try {
@@ -197,18 +199,42 @@ export async function POST(request: Request) {
       return { updatedTransaction, txHash, track };
     });
 
-    // Send investment confirmation email (don't block if it fails)
+    // Trigger webhooks (don't block if it fails)
     try {
-      // TODO: Implement sendInvestmentConfirmation with Resend
-      console.log('Investment confirmation:', {
+      await triggerWebhooks('trade.completed', {
+        tradeId: result.updatedTransaction.id,
         userId: user.id,
         trackId,
-        tokensAmount,
+        type: 'BUY',
+        quantity: tokensAmount,
+        price: transaction.price,
         totalValue: transaction.totalValue,
         txHash: result.txHash,
-      });
+      }, user.id);
     } catch (error) {
-      console.error('Failed to send investment confirmation email:', error);
+      console.error('Failed to trigger webhooks:', error);
+    }
+
+    // Send email notification (don't block if it fails)
+    try {
+      await sendTradeConfirmationEmail(
+        { email: user.email, name: user.name },
+        {
+          id: result.updatedTransaction.id,
+          type: 'BUY',
+          amount: tokensAmount,
+          price: transaction.price,
+          totalValue: transaction.totalValue,
+        },
+        {
+          id: result.track.id,
+          title: result.track.title,
+          artistName: result.track.artistName,
+          currentPrice: result.track.currentPrice,
+        }
+      );
+    } catch (error) {
+      console.error('Failed to send email:', error);
     }
 
     return NextResponse.json(
