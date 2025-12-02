@@ -128,67 +128,81 @@ export default function ArtistDashboardPage() {
           subtitle="Gerencie suas músicas e acompanhe seus ganhos"
           action={{
             label: "Nova Música",
-            onClick: () => console.log("Nova música"),
+            onClick: () => router.push("/artist/upload"),
             icon: <Plus className="w-4 h-4" />,
           }}
         />
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="bg-bg-secondary rounded-xl p-5 border border-border-primary">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 bg-accent-green/10 rounded-lg">
-                <DollarSign className="w-5 h-5 text-accent-green" />
+        {isLoadingStats ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="bg-bg-secondary rounded-xl p-5 border border-border-primary animate-pulse">
+                <div className="h-4 bg-bg-tertiary rounded w-24 mb-3"></div>
+                <div className="h-8 bg-bg-tertiary rounded w-32 mb-1"></div>
+                <div className="h-3 bg-bg-tertiary rounded w-20"></div>
               </div>
-              <span className="text-sm text-text-secondary">Total Arrecadado</span>
-            </div>
-            <p className="text-2xl font-bold text-text-primary">
-              {formatCurrency(mockArtistStats.totalEarnings)}
-            </p>
-            <p className="text-xs text-accent-green mt-1">
-              +{formatCurrency(mockArtistStats.monthlyEarnings)} este mês
-            </p>
+            ))}
           </div>
+        ) : stats ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div className="bg-bg-secondary rounded-xl p-5 border border-border-primary">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-accent-green/10 rounded-lg">
+                  <DollarSign className="w-5 h-5 text-accent-green" />
+                </div>
+                <span className="text-sm text-text-secondary">Total Arrecadado</span>
+              </div>
+              <p className="text-2xl font-bold text-text-primary">
+                {formatCurrency(stats.totalEarnings)}
+              </p>
+              <p className="text-xs text-accent-green mt-1">
+                +{formatCurrency(stats.monthlyEarnings)} este mês
+              </p>
+            </div>
 
-          <div className="bg-bg-secondary rounded-xl p-5 border border-border-primary">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <Play className="w-5 h-5 text-primary" />
+            <div className="bg-bg-secondary rounded-xl p-5 border border-border-primary">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-primary/10 rounded-lg">
+                  <Play className="w-5 h-5 text-primary" />
+                </div>
+                <span className="text-sm text-text-secondary">Total de Streams</span>
               </div>
-              <span className="text-sm text-text-secondary">Total de Streams</span>
+              <p className="text-2xl font-bold text-text-primary">
+                {formatNumber(stats.totalStreams)}
+              </p>
+              <p className="text-xs text-text-tertiary mt-1">Todas as plataformas</p>
             </div>
-            <p className="text-2xl font-bold text-text-primary">
-              {formatNumber(mockArtistStats.totalStreams)}
-            </p>
-            <p className="text-xs text-text-tertiary mt-1">Todas as plataformas</p>
-          </div>
 
-          <div className="bg-bg-secondary rounded-xl p-5 border border-border-primary">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 bg-secondary/10 rounded-lg">
-                <Users className="w-5 h-5 text-secondary" />
+            <div className="bg-bg-secondary rounded-xl p-5 border border-border-primary">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-secondary/10 rounded-lg">
+                  <Users className="w-5 h-5 text-secondary" />
+                </div>
+                <span className="text-sm text-text-secondary">Investidores</span>
               </div>
-              <span className="text-sm text-text-secondary">Investidores</span>
+              <p className="text-2xl font-bold text-text-primary">
+                {stats.totalInvestors}
+              </p>
+              <p className="text-xs text-text-tertiary mt-1">Holders únicos</p>
             </div>
-            <p className="text-2xl font-bold text-text-primary">
-              {mockArtistStats.totalInvestors}
-            </p>
-            <p className="text-xs text-text-tertiary mt-1">Holders únicos</p>
-          </div>
 
-          <div className="bg-bg-secondary rounded-xl p-5 border border-border-primary">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 bg-accent/10 rounded-lg">
-                <Music className="w-5 h-5 text-accent" />
+            <div className="bg-bg-secondary rounded-xl p-5 border border-border-primary">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-accent/10 rounded-lg">
+                  <Music className="w-5 h-5 text-accent" />
+                </div>
+                <span className="text-sm text-text-secondary">Músicas Listadas</span>
               </div>
-              <span className="text-sm text-text-secondary">Músicas Listadas</span>
+              <p className="text-2xl font-bold text-text-primary">
+                {stats.tracksListed}
+              </p>
+              <p className="text-xs text-text-tertiary mt-1">
+                {stats.pendingTracks > 0 && `${stats.pendingTracks} pendentes`}
+              </p>
             </div>
-            <p className="text-2xl font-bold text-text-primary">
-              {mockArtistStats.tracksListed}
-            </p>
-            <p className="text-xs text-text-tertiary mt-1">Na plataforma</p>
           </div>
-        </div>
+        ) : null}
 
         {/* My Tracks Section */}
         <div className="bg-bg-secondary rounded-xl border border-border-primary overflow-hidden">
@@ -196,9 +210,14 @@ export default function ArtistDashboardPage() {
             <h2 className="text-lg font-semibold text-text-primary">Minhas Músicas</h2>
           </div>
 
-          {mockTracks.length > 0 ? (
+          {isLoadingTracks ? (
+            <div className="p-12 text-center">
+              <Loader2 className="w-8 h-8 animate-spin text-text-tertiary mx-auto" />
+              <p className="text-text-secondary mt-3">Carregando músicas...</p>
+            </div>
+          ) : tracks.length > 0 ? (
             <div className="divide-y divide-border-subtle">
-              {mockTracks.map((track) => (
+              {tracks.map((track) => (
                 <div
                   key={track.id}
                   className="p-6 hover:bg-bg-elevated transition-colors"
@@ -206,9 +225,13 @@ export default function ArtistDashboardPage() {
                   <div className="flex items-center gap-4">
                     {/* Cover */}
                     <div className="w-16 h-16 rounded-lg bg-bg-tertiary overflow-hidden flex-shrink-0">
-                      <div className="w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-                        <Music className="w-6 h-6 text-text-tertiary" />
-                      </div>
+                      {track.coverUrl ? (
+                        <img src={track.coverUrl} alt={track.title} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
+                          <Music className="w-6 h-6 text-text-tertiary" />
+                        </div>
+                      )}
                     </div>
 
                     {/* Info */}
@@ -221,10 +244,10 @@ export default function ArtistDashboardPage() {
                       </div>
                       <div className="flex items-center gap-4 text-sm text-text-secondary">
                         <span>
-                          {track.tokensSold.toLocaleString()} / {track.tokensTotal.toLocaleString()} tokens
+                          {track.tokenInfo.sold.toLocaleString()} / {track.tokenInfo.total.toLocaleString()} tokens
                         </span>
                         <span>•</span>
-                        <span>{formatCurrency(track.currentPrice)} / token</span>
+                        <span>{formatCurrency(track.tokenInfo.pricePerToken)} / token</span>
                       </div>
                     </div>
 
@@ -233,19 +256,19 @@ export default function ArtistDashboardPage() {
                       <div className="text-right">
                         <p className="text-sm text-text-secondary">Arrecadado</p>
                         <p className="font-semibold text-text-primary">
-                          {formatCurrency(track.totalRaised)}
+                          {formatCurrency(track.earnings.totalRaised)}
                         </p>
                       </div>
                       <div className="text-right">
                         <p className="text-sm text-text-secondary">Streams/mês</p>
                         <p className="font-semibold text-text-primary">
-                          {formatNumber(track.monthlyStreams)}
+                          {formatNumber(track.earnings.monthlyStreams)}
                         </p>
                       </div>
                       <div className="text-right">
                         <p className="text-sm text-text-secondary">Royalties/mês</p>
                         <p className="font-semibold text-accent-green">
-                          {formatCurrency(track.monthlyRoyalties)}
+                          {formatCurrency(track.earnings.monthlyRoyalties)}
                         </p>
                       </div>
                     </div>
@@ -266,14 +289,14 @@ export default function ArtistDashboardPage() {
                     <div className="flex justify-between text-xs text-text-tertiary mb-1">
                       <span>Progresso da venda</span>
                       <span>
-                        {Math.round((track.tokensSold / track.tokensTotal) * 100)}%
+                        {Math.round((track.tokenInfo.sold / track.tokenInfo.total) * 100)}%
                       </span>
                     </div>
                     <div className="h-2 bg-bg-tertiary rounded-full overflow-hidden">
                       <div
                         className="h-full bg-gradient-to-r from-primary to-secondary rounded-full transition-all"
                         style={{
-                          width: `${(track.tokensSold / track.tokensTotal) * 100}%`,
+                          width: `${(track.tokenInfo.sold / track.tokenInfo.total) * 100}%`,
                         }}
                       />
                     </div>
@@ -290,10 +313,12 @@ export default function ArtistDashboardPage() {
               <p className="text-text-secondary mb-6">
                 Liste sua primeira música e comece a receber investimentos
               </p>
-              <Button>
-                <Plus className="w-4 h-4 mr-2" />
-                Adicionar Música
-              </Button>
+              <Link href="/artist/upload">
+                <Button>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Adicionar Música
+                </Button>
+              </Link>
             </div>
           )}
         </div>
