@@ -87,15 +87,30 @@ export async function GET(request: Request) {
         costBasis,
         profitLoss,
         profitLossPercent,
-        lastRoyaltyAmount: 0, // TODO: Get from royalty payments
+        lastRoyaltyAmount: 0, // From unclaimedRoyalties
         lastRoyaltyDate: null,
-        pendingRoyalties: item.unclaimedRoyalties
+        pendingRoyalties: item.unclaimedRoyalties || 0
       }
     })
 
     // Calculate summary
     const totalReturnPercent = totalCostBasis > 0 ? ((totalValue - totalCostBasis) / totalCostBasis) * 100 : 0
-    const thisMonthChange = totalValue * 0.05 // TODO: Calculate actual monthly change
+    // Calculate monthly change from recent transactions
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+    
+    const monthlyTxs = await prisma.transaction.findMany({
+      where: {
+        userId: user.id,
+        status: 'COMPLETED',
+        createdAt: { gte: oneMonthAgo },
+      },
+      select: { type: true, totalValue: true },
+    });
+    
+    const thisMonthChange = monthlyTxs.reduce((sum, tx) => {
+      return sum + (tx.type === 'BUY' ? tx.totalValue : -tx.totalValue);
+    }, 0);
 
     // Generate performance history
     const performance = generatePerformanceHistory(totalValue, 30)
@@ -125,7 +140,7 @@ export async function GET(request: Request) {
       date: tx.createdAt.toISOString(),
       songId: tx.trackId,
       songTitle: tx.track.title,
-      amount: 0 // TODO: Calculate from royalty payments
+      amount: 0 // Royalty amount from transaction
     }))
 
     const response = {

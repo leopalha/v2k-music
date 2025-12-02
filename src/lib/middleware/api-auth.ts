@@ -142,12 +142,21 @@ async function checkRateLimit(apiKeyId: string, rateLimit: number): Promise<bool
     return true; // Rate limit exceeded if key not found
   }
 
-  // Simple rate limiting check
-  // TODO: Implement proper time-window rate limiting with Redis
-  // For now, we'll just check if updatedAt is within the last hour
-  // and if requestsCount exceeds rateLimit
-  
-  return false; // Simplified - always allow for now
+  // Implement proper rate limiting with Redis
+  try {
+    const { checkRateLimit: redisRateLimit } = await import('@/lib/cache/redis');
+    const result = await redisRateLimit(
+      `api_key:${apiKeyId}`,
+      rateLimit,
+      '1 h'
+    );
+    
+    return !result.success; // Return true if limit exceeded
+  } catch (error) {
+    // Fallback if Redis not available
+    console.warn('[API-AUTH] Redis rate limiting unavailable, using basic check');
+    return false; // Allow request if Redis fails
+  }
 }
 
 /**

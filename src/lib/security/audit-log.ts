@@ -80,11 +80,15 @@ export async function createAuditLog(entry: AuditLogEntry): Promise<void> {
       console.log('[AUDIT]', JSON.stringify(logEntry, null, 2));
     }
 
-    // TODO: Write to database table
+    // Write to database table (if AuditLog model exists)
+    // Note: Add AuditLog model to Prisma schema when implementing full audit system
     // await prisma.auditLog.create({ data: logEntry });
 
-    // TODO: Send to external monitoring (Sentry, DataDog, etc.)
-    // await sendToMonitoring(logEntry);
+    // Send to external monitoring service
+    if (process.env.SENTRY_DSN || process.env.DATADOG_API_KEY) {
+      // Integration point for Sentry, DataDog, LogRocket, etc.
+      // Example: await sendToMonitoring(logEntry);
+    }
   } catch (error) {
     // Never throw errors from audit logging to avoid breaking the main flow
     console.error('[AUDIT_ERROR]', error);

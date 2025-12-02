@@ -141,15 +141,15 @@ export default function InvestmentModal({
         }
       } else {
         // PRODUCTION: Use real Stripe payment
-        const stripe = await stripePromise;
-
-        if (!stripe) {
-          throw new Error("Stripe não carregou");
+        // The backend should return a Checkout Session URL
+        if (createData.checkoutUrl) {
+          // Redirect to Stripe Checkout
+          window.location.href = createData.checkoutUrl;
+          return;
         }
-
-        // TODO: Implement real Stripe Checkout or Elements
-        // For now, throw error if not in mock mode
-        throw new Error('Pagamento real não implementado ainda');
+        
+        // Fallback: For now, show not implemented message
+        throw new Error('Stripe Checkout não configurado. Configure STRIPE_SECRET_KEY no .env');
       }
 
       // Confirm investment on backend

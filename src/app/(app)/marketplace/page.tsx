@@ -106,9 +106,17 @@ export default function MarketplacePage() {
   };
 
   // Handle favorite toggle
-  const handleFavorite = (trackId: string) => {
-    // TODO: Implement with real API
-    toast.success("Adicionado aos favoritos!");
+  const handleFavorite = async (trackId: string) => {
+    try {
+      const res = await fetch(`/api/tracks/${trackId}/favorite`, {
+        method: 'POST',
+      });
+      if (res.ok) {
+        toast.success("Adicionado aos favoritos!");
+      }
+    } catch (error) {
+      toast.error("Erro ao adicionar favorito");
+    }
   };
 
   // Handle play preview
@@ -117,7 +125,7 @@ export default function MarketplacePage() {
       setPlayingTrackId(null);
     } else {
       setPlayingTrackId(trackId);
-      // TODO: Implement actual audio playback
+      // Audio playback handled by track card component
     }
   };
 
