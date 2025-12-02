@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { formatCurrency, formatNumber } from "@/lib/utils";
 import Link from "next/link";
+import RoyaltiesDistributionModal from "@/components/artist/RoyaltiesDistributionModal";
 
 interface ArtistStats {
   totalEarnings: number;
@@ -56,6 +57,8 @@ export default function ArtistDashboardPage() {
   const [isLoadingStats, setIsLoadingStats] = useState(true);
   const [isLoadingTracks, setIsLoadingTracks] = useState(true);
   const [error, setError] = useState("");
+  const [selectedTrackForRoyalties, setSelectedTrackForRoyalties] = useState<Track | null>(null);
+  const [isRoyaltiesModalOpen, setIsRoyaltiesModalOpen] = useState(false);
 
   // Fetch stats on mount
   useEffect(() => {
@@ -92,6 +95,41 @@ export default function ArtistDashboardPage() {
     };
     fetchTracks();
   }, []);
+
+  const handleOpenRoyaltiesModal = (track: Track) => {
+    setSelectedTrackForRoyalties(track);
+    setIsRoyaltiesModalOpen(true);
+  };
+
+  const handleRoyaltiesSuccess = () => {
+    // Refresh stats and tracks after distribution
+    const fetchStats = async () => {
+      try {
+        const res = await fetch("/api/artist/stats");
+        if (res.ok) {
+          const data = await res.json();
+          setStats(data);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    
+    const fetchTracks = async () => {
+      try {
+        const res = await fetch("/api/artist/tracks");
+        if (res.ok) {
+          const data = await res.json();
+          setTracks(data.tracks || []);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    
+    fetchStats();
+    fetchTracks();
+  };
 
   const getStatusBadge = (status: string) => {
     const normalized = status.toUpperCase();
@@ -275,6 +313,15 @@ export default function ArtistDashboardPage() {
 
                     {/* Actions */}
                     <div className="flex items-center gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handleOpenRoyaltiesModal(track)}
+                        disabled={track.status !== 'LIVE' || track.holders === 0}
+                        title={track.status !== 'LIVE' ? 'Track deve estar LIVE' : track.holders === 0 ? 'Sem holders' : 'Distribuir royalties'}
+                      >
+                        <DollarSign className="w-4 h-4" />
+                      </Button>
                       <Button variant="outline" size="sm">
                         <BarChart3 className="w-4 h-4" />
                       </Button>
@@ -335,7 +382,16 @@ export default function ArtistDashboardPage() {
             </div>
           </button>
 
-          <button className="flex items-center gap-4 p-6 bg-bg-secondary rounded-xl border border-border-primary hover:border-primary/50 transition-colors text-left">
+          <button 
+            className="flex items-center gap-4 p-6 bg-bg-secondary rounded-xl border border-border-primary hover:border-primary/50 transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={() => {
+              const liveTrack = tracks.find(t => t.status === 'LIVE' && t.holders > 0);
+              if (liveTrack) {
+                handleOpenRoyaltiesModal(liveTrack);
+              }
+            }}
+            disabled={!tracks.some(t => t.status === 'LIVE' && t.holders > 0)}
+          >
             <div className="p-3 bg-accent-green/10 rounded-lg">
               <DollarSign className="w-6 h-6 text-accent-green" />
             </div>
@@ -356,6 +412,21 @@ export default function ArtistDashboardPage() {
           </button>
         </div>
       </div>
+
+      {/* Royalties Distribution Modal */}
+      {selectedTrackForRoyalties && (
+        <RoyaltiesDistributionModal
+          isOpen={isRoyaltiesModalOpen}
+          onClose={() => {
+            setIsRoyaltiesModalOpen(false);
+            setSelectedTrackForRoyalties(null);
+          }}
+          trackId={selectedTrackForRoyalties.id}
+          trackTitle={selectedTrackForRoyalties.title}
+          currentHolders={selectedTrackForRoyalties.holders}
+          onSuccess={handleRoyaltiesSuccess}
+        />
+      )}
     </AppLayout>
   );
 }

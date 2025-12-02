@@ -1,12 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { TrendingUp, TrendingDown } from "lucide-react";
-import { Badge } from "@/components/ui";
+import { TrendingUp, TrendingDown, DollarSign, Loader2 } from "lucide-react";
+import { Badge, Button } from "@/components/ui";
 import { formatCurrency, formatNumber } from "@/lib/utils";
+import { toast } from "@/components/ui/use-toast";
 
 interface PortfolioCardProps {
-  trackId: number;
+  trackId: number | string;
   title: string;
   artist: string;
   coverUrl?: string;
@@ -17,6 +19,8 @@ interface PortfolioCardProps {
   totalValue: number;
   monthlyEarnings: number;
   priceChange24h: number;
+  unclaimedRoyalties?: number;
+  onClaimSuccess?: () => void;
 }
 
 export function PortfolioCard({
@@ -31,11 +35,52 @@ export function PortfolioCard({
   totalValue,
   monthlyEarnings,
   priceChange24h,
+  unclaimedRoyalties = 0,
+  onClaimSuccess,
 }: PortfolioCardProps) {
+  const [isClaiming, setIsClaiming] = useState(false);
   const ownershipPercentage = (tokensOwned / totalSupply) * 100;
   const profitLoss = (currentPrice - purchasePrice) * tokensOwned;
   const profitLossPercentage = ((currentPrice - purchasePrice) / purchasePrice) * 100;
   const isProfit = profitLoss >= 0;
+
+  const handleClaim = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    setIsClaiming(true);
+    try {
+      const response = await fetch('/api/investor/royalties/claim', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ trackId }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Erro ao fazer claim');
+      }
+
+      toast.success(
+        'Royalties resgatados!',
+        `Você recebeu ${formatCurrency(data.claimedAmount)} no seu saldo`
+      );
+
+      if (onClaimSuccess) {
+        onClaimSuccess();
+      }
+    } catch (err: any) {
+      toast.error(
+        'Erro ao resgatar royalties',
+        err.message || 'Tente novamente'
+      );
+    } finally {
+      setIsClaiming(false);
+    }
+  };
 
   return (
     <Link href={`/track/${trackId}`}>
@@ -124,6 +169,43 @@ export function PortfolioCard({
             </div>
           </div>
         </div>
+
+        {/* Unclaimed Royalties Banner */}
+        {unclaimedRoyalties > 0 && (
+          <div className="mt-4 pt-4 border-t border-border-subtle">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <div className="flex items-center justify-center w-8 h-8 bg-accent-green/10 rounded-lg">
+                  <DollarSign className="w-4 h-4 text-accent-green" />
+                </div>
+                <div>
+                  <div className="text-xs text-text-tertiary">Royalties Disponíveis</div>
+                  <div className="font-semibold text-accent-green">
+                    {formatCurrency(unclaimedRoyalties)}
+                  </div>
+                </div>
+              </div>
+              <Button
+                size="sm"
+                onClick={handleClaim}
+                disabled={isClaiming}
+                className="flex items-center gap-2"
+              >
+                {isClaiming ? (
+                  <>
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                    Resgatando...
+                  </>
+                ) : (
+                  <>
+                    <DollarSign className="w-3 h-3" />
+                    Resgatar
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </Link>
   );
