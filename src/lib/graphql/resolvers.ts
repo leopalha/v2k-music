@@ -1,3 +1,4 @@
+import 'server-only';
 import { GraphQLError } from 'graphql';
 import { prisma } from '@/lib/prisma';
 import type { User, Track, Transaction, PriceAlert } from '@prisma/client';
