@@ -120,7 +120,7 @@ export function FilterBar({
 
           {totalResults !== undefined && (
             <span className="text-sm text-text-secondary">
-              {totalResults.toLocaleString("pt-BR")} músicas
+              {(totalResults ?? 0).toLocaleString("pt-BR")} músicas
             </span>
           )}
         </div>

@@ -48,6 +48,11 @@ export function TrackCard({
   const [isInWatchlist, setIsInWatchlist] = useState(false);
   const [isTogglingWatchlist, setIsTogglingWatchlist] = useState(false);
 
+  // Safe calculations with fallbacks
+  const totalTokens = track.totalTokens ?? 0;
+  const availableTokens = track.availableTokens ?? 0;
+  const soldPercentage = totalTokens > 0 ? ((totalTokens - availableTokens) / totalTokens) * 100 : 0;
+
   // Check if track is in watchlist
   useEffect(() => {
     const checkWatchlistStatus = async () => {
@@ -419,8 +424,8 @@ export function TrackCard({
             <div className="flex items-center justify-between text-sm">
               <span className="text-text-tertiary">Disponível</span>
               <span className="text-text-secondary font-medium">
-                {track.availableTokens.toLocaleString("pt-BR")} /{" "}
-                {track.totalTokens.toLocaleString("pt-BR")} tokens
+                {availableTokens.toLocaleString("pt-BR")} /{" "}
+                {totalTokens.toLocaleString("pt-BR")} tokens
               </span>
             </div>
             {/* Progress bar */}
@@ -428,7 +433,7 @@ export function TrackCard({
               <div
                 className="h-full bg-primary-400 rounded-full transition-all"
                 style={{
-                  width: `${((track.totalTokens - track.availableTokens) / track.totalTokens) * 100}%`,
+                  width: `${soldPercentage}%`,
                 }}
               />
             </div>

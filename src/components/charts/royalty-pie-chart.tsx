@@ -28,11 +28,19 @@ const LABELS = {
 };
 
 export function RoyaltyPieChart({ data, className }: RoyaltyPieChartProps) {
+  // Validate data with fallbacks
+  const safeData = {
+    spotify: data?.spotify ?? 0,
+    youtube: data?.youtube ?? 0,
+    appleMusic: data?.appleMusic ?? 0,
+    other: data?.other ?? 0,
+  };
+
   const chartData = [
-    { name: "Spotify", value: data.spotify, color: COLORS.spotify },
-    { name: "YouTube", value: data.youtube, color: COLORS.youtube },
-    { name: "Apple Music", value: data.appleMusic, color: COLORS.appleMusic },
-    { name: "Outros", value: data.other, color: COLORS.other },
+    { name: "Spotify", value: safeData.spotify, color: COLORS.spotify },
+    { name: "YouTube", value: safeData.youtube, color: COLORS.youtube },
+    { name: "Apple Music", value: safeData.appleMusic, color: COLORS.appleMusic },
+    { name: "Outros", value: safeData.other, color: COLORS.other },
   ];
 
   // Normalize to 100%
@@ -64,10 +72,21 @@ export function RoyaltyPieChart({ data, className }: RoyaltyPieChartProps) {
     return null;
   };
 
+  // Check if there's any data
+  const hasData = total > 0;
+
+  if (!hasData) {
+    return (
+      <div className={cn("flex items-center justify-center h-40", className)}>
+        <p className="text-text-tertiary text-sm">Sem dados de royalties disponíveis</p>
+      </div>
+    );
+  }
+
   return (
     <div className={cn("flex items-center gap-6", className)}>
       {/* Chart */}
-      <div className="w-40 h-40">
+      <div className="w-40 h-40 flex-shrink-0">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie

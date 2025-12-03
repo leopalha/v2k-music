@@ -118,11 +118,14 @@ export default function TrackDetailPage() {
           const res = await fetch("/api/user/me");
           if (res.ok) {
             const data = await res.json();
-            setCurrentUser({
-              id: data.user.id,
-              name: data.user.name,
-              profileImageUrl: data.user.profileImageUrl,
-            });
+            // Validate user data exists
+            if (data?.user?.id) {
+              setCurrentUser({
+                id: data.user.id,
+                name: data.user.name,
+                profileImageUrl: data.user.profileImageUrl,
+              });
+            }
           }
         } catch (error) {
           console.error("Error fetching current user:", error);
@@ -221,10 +224,13 @@ export default function TrackDetailPage() {
     );
   }
 
-  const soldTokens = track.totalTokens - track.availableTokens;
-  const soldPercentage = (soldTokens / track.totalTokens) * 100;
-  const investmentTotal = tokenAmount * track.pricePerToken;
-  const estimatedMonthlyReturn = tokenAmount * track.avgRoyaltyPerToken;
+  // Safe calculations with fallbacks
+  const totalTokens = track.totalTokens ?? 0;
+  const availableTokens = track.availableTokens ?? 0;
+  const soldTokens = totalTokens - availableTokens;
+  const soldPercentage = totalTokens > 0 ? (soldTokens / totalTokens) * 100 : 0;
+  const investmentTotal = tokenAmount * (track.pricePerToken ?? 0);
+  const estimatedMonthlyReturn = tokenAmount * (track.avgRoyaltyPerToken ?? 0);
 
   const riskConfig = {
     LOW: {
@@ -453,7 +459,9 @@ export default function TrackDetailPage() {
             {track.performance && track.performance.length > 0 && (
               <div className="bg-bg-secondary border border-border-default rounded-xl p-4">
                 <h3 className="text-lg font-semibold text-text-primary mb-4">Histórico de Preço</h3>
-                <PriceChart data={track.performance} />
+                <div className="min-h-[300px]">
+                  <PriceChart data={track.performance} />
+                </div>
               </div>
             )}
 
@@ -477,12 +485,13 @@ export default function TrackDetailPage() {
             </div>
 
             {/* Royalty Breakdown */}
-            <div className="bg-bg-secondary rounded-2xl p-4 sm:p-6">
-              <h2 className="text-base sm:text-lg font-semibold text-text-primary mb-4">
-                Distribuição de Royalties
-              </h2>
-              <div className="flex flex-col items-center gap-6 sm:gap-8">
-                <RoyaltyPieChart data={track.royaltyBreakdown} />
+            {track.royaltyBreakdown && (
+              <div className="bg-bg-secondary rounded-2xl p-4 sm:p-6">
+                <h2 className="text-base sm:text-lg font-semibold text-text-primary mb-4">
+                  Distribuição de Royalties
+                </h2>
+                <div className="flex flex-col items-center gap-6 sm:gap-8">
+                  <RoyaltyPieChart data={track.royaltyBreakdown} />
                 <div className="flex-1 space-y-4">
                 <div className="bg-bg-elevated rounded-xl p-4">
                     <p className="text-sm text-text-tertiary mb-1">
@@ -502,7 +511,8 @@ export default function TrackDetailPage() {
                   </div>
                 </div>
               </div>
-            </div>
+              </div>
+            )}
 
             {/* Similar Tracks */}
             {similarTracks.length > 0 && (
@@ -553,7 +563,7 @@ export default function TrackDetailPage() {
                   <div className="flex items-center justify-between text-sm mb-2">
                     <span className="text-text-secondary">Tokens vendidos</span>
                     <span className="text-text-primary font-medium">
-                      {soldTokens.toLocaleString()} / {track.totalTokens.toLocaleString()}
+                      {soldTokens.toLocaleString('pt-BR')} / {totalTokens.toLocaleString('pt-BR')}
                     </span>
                   </div>
                   <div className="h-3 bg-bg-elevated rounded-full overflow-hidden">
@@ -563,7 +573,7 @@ export default function TrackDetailPage() {
                     />
                   </div>
                   <p className="text-xs text-text-tertiary mt-1">
-                    {track.availableTokens.toLocaleString()} tokens disponíveis
+                    {availableTokens.toLocaleString('pt-BR')} tokens disponíveis
                   </p>
                 </div>
 
@@ -584,14 +594,14 @@ export default function TrackDetailPage() {
                       value={tokenAmount}
                       onChange={(e) =>
                         setTokenAmount(
-                          Math.max(1, Math.min(track.availableTokens, parseInt(e.target.value) || 1))
+                          Math.max(1, Math.min(availableTokens, parseInt(e.target.value) || 1))
                         )
                       }
                       className="flex-1 bg-bg-elevated border border-border-default rounded-xl px-4 py-2.5 text-center text-lg font-mono font-medium text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-400/20"
                     />
                     <button
                       onClick={() =>
-                        setTokenAmount(Math.min(track.availableTokens, tokenAmount + 10))
+                        setTokenAmount(Math.min(availableTokens, tokenAmount + 10))
                       }
                       className="w-10 h-10 rounded-xl bg-bg-elevated flex items-center justify-center text-text-secondary hover:text-text-primary hover:bg-bg-primary transition-colors"
                     >
@@ -603,7 +613,7 @@ export default function TrackDetailPage() {
                     {[10, 50, 100, 500].map((amount) => (
                       <button
                         key={amount}
-                        onClick={() => setTokenAmount(Math.min(track.availableTokens, amount))}
+                        onClick={() => setTokenAmount(Math.min(availableTokens, amount))}
                         className={cn(
                           "flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors",
                           tokenAmount === amount
@@ -699,7 +709,7 @@ export default function TrackDetailPage() {
                   <div className="flex items-center justify-between">
                     <span className="text-text-tertiary">Total Supply</span>
                     <span className="text-text-primary font-mono">
-                      {track.totalTokens.toLocaleString()}
+                      {totalTokens.toLocaleString('pt-BR')}
                     </span>
                   </div>
                 </div>
