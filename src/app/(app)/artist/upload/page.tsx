@@ -110,7 +110,7 @@ export default function ArtistUploadPage() {
   if (success) {
     return (
       <AppLayout>
-        <div className="max-w-2xl mx-auto text-center py-12">
+        <div className="max-w-2xl mx-auto text-center py-12" data-testid="success-message">
           <div className="w-20 h-20 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-4">
             <Check className="w-10 h-10 text-success" />
           </div>
@@ -318,6 +318,7 @@ export default function ArtistUploadPage() {
             </Link>
             <Button
               type="submit"
+              data-testid="submit-track"
               disabled={isUploading || !audioFile || !coverFile}
               icon={isUploading ? undefined : <Upload className="w-4 h-4" />}
             >

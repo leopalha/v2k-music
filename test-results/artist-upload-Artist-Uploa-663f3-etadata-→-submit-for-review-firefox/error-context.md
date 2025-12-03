@@ -1,0 +1,126 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - link [ref=e5] [cursor=pointer]:
+        - /url: /
+        - img [ref=e6]: V2KMUSIC
+      - navigation [ref=e19]:
+        - generic [ref=e20]:
+          - link "Discover" [ref=e21] [cursor=pointer]:
+            - /url: /marketplace
+            - img [ref=e22]
+            - generic [ref=e25]: Discover
+          - link "Portfolio" [ref=e26] [cursor=pointer]:
+            - /url: /portfolio
+            - img [ref=e27]
+            - generic [ref=e30]: Portfolio
+          - link "Favorites" [ref=e31] [cursor=pointer]:
+            - /url: /favorites
+            - img [ref=e32]
+            - generic [ref=e34]: Favorites
+          - link "Trending" [ref=e35] [cursor=pointer]:
+            - /url: /trending
+            - img [ref=e36]
+            - generic [ref=e39]: Trending
+        - generic [ref=e41]:
+          - link "Leaderboard" [ref=e42] [cursor=pointer]:
+            - /url: /leaderboard
+            - img [ref=e43]
+            - generic [ref=e50]: Leaderboard
+          - link "My Tracks" [ref=e51] [cursor=pointer]:
+            - /url: /artist/dashboard
+            - img [ref=e52]
+            - generic [ref=e56]: My Tracks
+      - link "U Minha Conta Ver perfil" [ref=e58] [cursor=pointer]:
+        - /url: /profile
+        - generic [ref=e60]: U
+        - generic [ref=e61]:
+          - paragraph [ref=e62]: Minha Conta
+          - paragraph [ref=e63]: Ver perfil
+        - img [ref=e64]
+    - main [ref=e67]:
+      - generic [ref=e69]:
+        - generic [ref=e73]:
+          - img [ref=e75]
+          - textbox "Buscar músicas, artistas..." [ref=e78]
+        - generic [ref=e79]:
+          - button "Connect Wallet" [ref=e82]:
+            - img [ref=e83]
+            - text: Connect Wallet
+          - button "Notifications" [ref=e87]:
+            - img [ref=e88]
+      - generic [ref=e92]:
+        - generic [ref=e93]:
+          - link "Voltar para Dashboard" [ref=e94] [cursor=pointer]:
+            - /url: /artist/dashboard
+            - img [ref=e95]
+            - text: Voltar para Dashboard
+          - generic [ref=e100]:
+            - heading "Upload de Música" [level=1] [ref=e101]
+            - paragraph [ref=e102]: Envie uma nova música para tokenização na plataforma
+        - generic [ref=e103]:
+          - generic [ref=e104]:
+            - heading "Informações Básicas" [level=3] [ref=e105]
+            - generic [ref=e106]:
+              - generic [ref=e107]:
+                - generic [ref=e108]: Título da Música *
+                - 'textbox "Ex: Minha Nova Música" [ref=e110]'
+              - generic [ref=e111]:
+                - generic [ref=e112]: Gênero
+                - combobox [ref=e113]:
+                  - option "POP" [selected]
+                  - option "ROCK"
+                  - option "RAP"
+                  - option "FUNK"
+                  - option "SERTANEJO"
+                  - option "ELETRONIC"
+                  - option "JAZZ"
+                  - option "REGGAE"
+                  - option "INDIE"
+                  - option "OUTRO"
+              - generic [ref=e114]:
+                - generic [ref=e115]: Descrição (opcional)
+                - textbox "Conte mais sobre sua música..." [ref=e116]
+          - generic [ref=e117]:
+            - heading "Arquivos" [level=3] [ref=e118]
+            - generic [ref=e119]:
+              - generic [ref=e120]:
+                - generic [ref=e121]: Arquivo de Áudio *
+                - generic [ref=e123] [cursor=pointer]:
+                  - img [ref=e124]
+                  - paragraph [ref=e128]: Clique para fazer upload
+                  - paragraph [ref=e129]: "MP3, WAV ou FLAC (máx: 50MB)"
+              - generic [ref=e130]:
+                - generic [ref=e131]: Capa da Música *
+                - generic [ref=e133] [cursor=pointer]:
+                  - img [ref=e134]
+                  - paragraph [ref=e138]: Clique para fazer upload
+                  - paragraph [ref=e139]: "JPG ou PNG (máx: 5MB, min: 500x500px)"
+          - generic [ref=e140]:
+            - heading "Configuração de Tokens" [level=3] [ref=e141]
+            - generic [ref=e142]:
+              - generic [ref=e143]:
+                - generic [ref=e144]: Preço por Token (R$) *
+                - spinbutton [ref=e146]: "0.01"
+              - generic [ref=e147]:
+                - generic [ref=e148]: Total de Tokens *
+                - spinbutton [ref=e150]: "10000"
+            - generic [ref=e151]:
+              - paragraph [ref=e152]: "Valor Total da Oferta:"
+              - paragraph [ref=e153]: R$ 100,00
+          - generic [ref=e154]:
+            - link "Cancelar" [ref=e155] [cursor=pointer]:
+              - /url: /artist/dashboard
+              - button "Cancelar" [ref=e156]
+            - button "Enviar Música" [disabled]:
+              - img
+              - text: Enviar Música
+  - region "Notifications (F8)":
+    - list
+  - button "Open Next.js Dev Tools" [ref=e162] [cursor=pointer]:
+    - img [ref=e163]
+  - alert [ref=e167]
+```

@@ -24,7 +24,7 @@ export function PortfolioStats({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       {/* Total Value */}
-      <div className="bg-bg-secondary border border-border-primary rounded-xl p-6">
+      <div className="bg-bg-secondary border border-border-primary rounded-xl p-6" data-testid="portfolio-value">
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm text-text-secondary">Valor Total</span>
           <div className="p-2 bg-primary/10 rounded-lg">
@@ -34,7 +34,7 @@ export function PortfolioStats({
         <div className="text-2xl font-bold text-text-primary mb-1">
           {formatCurrency(totalValue)}
         </div>
-        <div className={`text-sm ${isProfit ? "text-accent-green" : "text-accent-red"}`}>
+        <div className={`text-sm ${isProfit ? "text-accent-green" : "text-accent-red"}`} data-testid="total-roi">
           {isProfit ? "+" : ""}
           {formatCurrency(profitLoss)} ({roi > 0 ? "+" : ""}
           {roi.toFixed(2)}%)
@@ -42,7 +42,7 @@ export function PortfolioStats({
       </div>
 
       {/* Total Invested */}
-      <div className="bg-bg-secondary border border-border-primary rounded-xl p-6">
+      <div className="bg-bg-secondary border border-border-primary rounded-xl p-6" data-testid="cash-balance">
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm text-text-secondary">Total Investido</span>
           <div className="p-2 bg-secondary/10 rounded-lg">

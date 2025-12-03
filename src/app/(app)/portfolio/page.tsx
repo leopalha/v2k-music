@@ -2,100 +2,18 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { AppLayout, PageHeader } from "@/components/layout";
-import { PortfolioStats, PortfolioCard, RoyaltyHistory, ClaimRoyaltiesButton } from "@/components/portfolio";
+import { PortfolioStats, PortfolioCard, ClaimRoyaltiesButton } from "@/components/portfolio";
 import { ShareCard } from "@/components/portfolio/ShareCard";
 import { PortfolioMetrics } from "@/components/portfolio/PortfolioMetrics";
 import { PortfolioPerformanceChart } from "@/components/portfolio/PortfolioPerformanceChart";
 import { AssetAllocationChart } from "@/components/portfolio/AssetAllocationChart";
 import { TopPerformersTable } from "@/components/portfolio/TopPerformersTable";
+import { LimitOrdersSection } from "@/components/portfolio/LimitOrdersSection";
 import { Button } from "@/components/ui";
 import { Download, Filter, TrendingUp } from "lucide-react";
 import { useUserPortfolio, useUserClaimableDistributions } from "@/lib/web3/hooks";
 import { useAccount } from "wagmi";
 import { usePortfolioAPI } from "@/hooks/usePortfolioAPI";
-
-// Mock data - will be replaced with real data from blockchain
-const mockPortfolioData = {
-  stats: {
-    totalValue: 5420.5,
-    totalInvested: 4800,
-    totalEarnings: 620.5,
-    totalTracks: 8,
-    roi: 12.93,
-  },
-  holdings: [
-    {
-      trackId: 1,
-      title: "Modo Turbo",
-      artist: "MC Kevinho",
-      coverUrl: "/api/placeholder/64/64",
-      tokensOwned: 500,
-      totalSupply: 10000,
-      currentPrice: 0.015,
-      purchasePrice: 0.01,
-      totalValue: 7.5,
-      monthlyEarnings: 2.5,
-      priceChange24h: 5.2,
-    },
-    {
-      trackId: 2,
-      title: "Rave de Favela",
-      artist: "MC Lan",
-      coverUrl: "/api/placeholder/64/64",
-      tokensOwned: 1000,
-      totalSupply: 8000,
-      currentPrice: 0.02,
-      purchasePrice: 0.015,
-      totalValue: 20,
-      monthlyEarnings: 8.0,
-      priceChange24h: 8.5,
-    },
-    {
-      trackId: 3,
-      title: "Beat do Tik Tok",
-      artist: "DJ GBR",
-      coverUrl: "/api/placeholder/64/64",
-      tokensOwned: 250,
-      totalSupply: 5000,
-      currentPrice: 0.012,
-      purchasePrice: 0.013,
-      totalValue: 3,
-      monthlyEarnings: 1.2,
-      priceChange24h: -7.7,
-    },
-  ],
-  royaltyHistory: [
-    {
-      id: "1",
-      trackTitle: "Modo Turbo",
-      trackId: 1,
-      amount: 2.5,
-      source: "Spotify",
-      date: new Date("2025-11-15"),
-      status: "completed" as const,
-      txHash: "0x1234567890abcdef",
-    },
-    {
-      id: "2",
-      trackTitle: "Rave de Favela",
-      trackId: 2,
-      amount: 8.0,
-      source: "YouTube",
-      date: new Date("2025-11-15"),
-      status: "completed" as const,
-      txHash: "0xabcdef1234567890",
-    },
-    {
-      id: "3",
-      trackTitle: "Beat do Tik Tok",
-      trackId: 3,
-      amount: 1.2,
-      source: "Apple Music",
-      date: new Date("2025-11-15"),
-      status: "pending" as const,
-    },
-  ],
-};
 
 export default function PortfolioPage() {
   const [filterOpen, setFilterOpen] = useState(false);
@@ -154,20 +72,30 @@ export default function PortfolioPage() {
     }));
   }, [blockchainHoldings, isConnected, isLoading]);
 
-  // Use API data if available, then blockchain data, then mock
-  const holdings = portfolioData?.holdings.map(h => ({
-    trackId: parseInt(h.songId),
-    title: h.title,
-    artist: h.artist,
-    coverUrl: h.coverArt,
-    tokensOwned: h.tokensOwned,
-    totalSupply: 10000, // TODO: Get from track info
-    currentPrice: h.currentValue / h.tokensOwned,
-    purchasePrice: h.costBasis / h.tokensOwned,
-    totalValue: h.currentValue,
-    monthlyEarnings: h.lastRoyaltyAmount || 0,
-    priceChange24h: h.profitLossPercent,
-  })) || (realHoldings.length > 0 ? realHoldings : mockPortfolioData.holdings);
+  // Use API data from /api/portfolio/holdings
+  const [apiHoldings, setApiHoldings] = useState<any[]>([]);
+  const [isLoadingHoldings, setIsLoadingHoldings] = useState(true);
+
+  useEffect(() => {
+    const loadHoldings = async () => {
+      try {
+        setIsLoadingHoldings(true);
+        const res = await fetch('/api/portfolio/holdings');
+        if (res.ok) {
+          const data = await res.json();
+          setApiHoldings(data.holdings || []);
+        }
+      } catch (error) {
+        console.error('Error loading holdings:', error);
+      } finally {
+        setIsLoadingHoldings(false);
+      }
+    };
+    loadHoldings();
+  }, []);
+
+  // Use API data if available, fallback to blockchain
+  const holdings = apiHoldings.length > 0 ? apiHoldings : realHoldings;
 
   // Calculate real stats from API or blockchain
   const stats = useMemo(() => {
@@ -179,10 +107,6 @@ export default function PortfolioPage() {
         totalTracks: portfolioData.summary.totalSongs,
         roi: portfolioData.summary.totalReturnPercent,
       };
-    }
-
-    if (realHoldings.length === 0) {
-      return mockPortfolioData.stats;
     }
 
     const totalValue = realHoldings.reduce((sum, h) => sum + h.totalValue, 0);
@@ -200,18 +124,7 @@ export default function PortfolioPage() {
   }, [realHoldings, portfolioData]);
 
   // Claimable distributions (pending royalties)
-  // Use real blockchain distributions if available, otherwise use mock
-  const claimableDistributions = blockchainDistributions.length > 0
-    ? blockchainDistributions
-    : mockPortfolioData.royaltyHistory
-        .filter((payment) => payment.status === "pending")
-        .map((payment) => ({
-          id: parseInt(payment.id),
-          trackTitle: payment.trackTitle,
-          amount: payment.amount,
-          source: payment.source,
-          date: payment.date,
-        }));
+  const claimableDistributions = blockchainDistributions;
 
   const sortedHoldings = [...holdings].sort((a, b) => {
     switch (sortBy) {
@@ -236,7 +149,7 @@ export default function PortfolioPage() {
         />
 
         {/* Stats */}
-        <div className="mb-8">
+        <div className="mb-8" data-testid="portfolio-overview">
           <PortfolioStats {...stats} />
         </div>
 
@@ -250,6 +163,11 @@ export default function PortfolioPage() {
         {/* Portfolio Sharing */}
         <div className="mb-8">
           <ShareCard />
+        </div>
+
+        {/* Limit Orders */}
+        <div className="mb-8">
+          <LimitOrdersSection />
         </div>
 
         {/* Portfolio Analytics */}
@@ -366,16 +284,17 @@ export default function PortfolioPage() {
           </div>
 
           {/* Holdings Grid */}
-          <div className="space-y-4">
-            {sortedHoldings.map((holding) => (
-              <PortfolioCard key={holding.trackId} {...holding} />
-            ))}
+          <div className="space-y-4" data-testid="holdings-section">
+            {sortedHoldings.length === 0 ? (
+              <div className="text-center py-12" data-testid="empty-holdings">
+                <p className="text-text-tertiary">Você ainda não possui músicas no portfolio</p>
+              </div>
+            ) : (
+              sortedHoldings.map((holding) => (
+                <PortfolioCard key={holding.trackId} {...holding} />
+              ))
+            )}
           </div>
-        </div>
-
-        {/* Royalty History */}
-        <div>
-          <RoyaltyHistory payments={mockPortfolioData.royaltyHistory} />
         </div>
       </div>
     </AppLayout>

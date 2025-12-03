@@ -1,4 +1,4 @@
-import 'server-only';
+// import 'server-only'; // Temporarily commented for NextAuth compatibility
 import { PrismaClient } from '@prisma/client';
 import { queryLoggerWithMetrics } from './query-logger';
 

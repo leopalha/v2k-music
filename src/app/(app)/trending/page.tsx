@@ -1,85 +1,57 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { AppLayout, PageHeader } from "@/components/layout";
 import { type Track } from "@/components/tracks";
-import { TrendingUp, TrendingDown, Flame, Clock, BarChart3, Play, Heart } from "lucide-react";
+import { TrendingUp, TrendingDown, Flame, Clock, BarChart3, Play, Heart, Loader2, Music } from "lucide-react";
 import { formatCurrency, formatPercentage } from "@/lib/utils";
 
-// Mock data - will be replaced with real data
-const mockTrending: (Track & { rank: number })[] = [
-  {
-    id: "1",
-    title: "Modo Turbo",
-    artist: "MC Kevinho",
-    coverArt: "",
-    genre: "Funk",
-    pricePerToken: 0.015,
-    currentROI: 15.2,
-    riskLevel: "LOW",
-    totalTokens: 10000,
-    availableTokens: 3500,
-    rank: 1,
-  },
-  {
-    id: "2",
-    title: "Rave de Favela",
-    artist: "MC Lan",
-    coverArt: "",
-    genre: "Funk",
-    pricePerToken: 0.02,
-    currentROI: 12.5,
-    riskLevel: "MEDIUM",
-    totalTokens: 8000,
-    availableTokens: 2000,
-    rank: 2,
-  },
-  {
-    id: "3",
-    title: "Beat Envolvente",
-    artist: "DJ Lucas Beat",
-    coverArt: "",
-    genre: "Funk",
-    pricePerToken: 0.018,
-    currentROI: 10.3,
-    riskLevel: "LOW",
-    totalTokens: 12000,
-    availableTokens: 5000,
-    rank: 3,
-  },
-  {
-    id: "4",
-    title: "Solta o Som",
-    artist: "MC Davi",
-    coverArt: "",
-    genre: "Funk",
-    pricePerToken: 0.025,
-    currentROI: 8.7,
-    riskLevel: "MEDIUM",
-    totalTokens: 6000,
-    availableTokens: 1500,
-    rank: 4,
-  },
-  {
-    id: "5",
-    title: "Baile do Piso",
-    artist: "DJ Rennan",
-    coverArt: "",
-    genre: "Funk",
-    pricePerToken: 0.011,
-    currentROI: 6.2,
-    riskLevel: "LOW",
-    totalTokens: 15000,
-    availableTokens: 8000,
-    rank: 5,
-  },
-];
+interface TrendingTrack extends Track {
+  rank: number;
+  trendScore: number;
+  volume: number;
+  transactions: number;
+  priceChange: number;
+  holders: number;
+}
+
+interface TrendingData {
+  tracks: TrendingTrack[];
+  stats: {
+    topGainer: { title: string; change: number } | null;
+    totalVolume: number;
+    totalTransactions: number;
+  };
+  timeRange: string;
+}
 
 type TimeRange = "24h" | "7d" | "30d";
 
 export default function TrendingPage() {
   const [timeRange, setTimeRange] = useState<TimeRange>("24h");
+  const [data, setData] = useState<TrendingData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchTrending = async () => {
+      try {
+        setIsLoading(true);
+        const res = await fetch(`/api/trending?range=${timeRange}`);
+        if (!res.ok) throw new Error("Failed to fetch");
+        const json = await res.json();
+        setData(json);
+      } catch (err) {
+        console.error(err);
+        setError("Erro ao carregar trending");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTrending();
+  }, [timeRange]);
 
   return (
     <AppLayout>
@@ -111,44 +83,76 @@ export default function TrendingPage() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <div className="bg-bg-secondary rounded-xl p-4 border border-border-primary">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-accent-green/10 rounded-lg">
-                <Flame className="w-5 h-5 text-accent-green" />
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="bg-bg-secondary rounded-xl p-4 border border-border-primary animate-pulse">
+                <div className="h-4 bg-bg-tertiary rounded w-24 mb-2"></div>
+                <div className="h-8 bg-bg-tertiary rounded w-32"></div>
               </div>
-              <span className="text-sm text-text-secondary">Maior Alta</span>
-            </div>
-            <p className="text-2xl font-bold text-accent-green">+15.2%</p>
-            <p className="text-sm text-text-tertiary">Modo Turbo</p>
+            ))}
           </div>
+        ) : data ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div className="bg-bg-secondary rounded-xl p-4 border border-border-primary">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-accent-green/10 rounded-lg">
+                  <Flame className="w-5 h-5 text-accent-green" />
+                </div>
+                <span className="text-sm text-text-secondary">Maior Alta</span>
+              </div>
+              {data.stats.topGainer ? (
+                <>
+                  <p className="text-2xl font-bold text-accent-green">
+                    +{data.stats.topGainer.change.toFixed(1)}%
+                  </p>
+                  <p className="text-sm text-text-tertiary">{data.stats.topGainer.title}</p>
+                </>
+              ) : (
+                <p className="text-sm text-text-tertiary">Sem dados</p>
+              )}
+            </div>
 
-          <div className="bg-bg-secondary rounded-xl p-4 border border-border-primary">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <BarChart3 className="w-5 h-5 text-primary" />
+            <div className="bg-bg-secondary rounded-xl p-4 border border-border-primary">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-primary/10 rounded-lg">
+                  <BarChart3 className="w-5 h-5 text-primary" />
+                </div>
+                <span className="text-sm text-text-secondary">Volume Total</span>
               </div>
-              <span className="text-sm text-text-secondary">Volume Total</span>
+              <p className="text-2xl font-bold text-text-primary">
+                {formatCurrency(data.stats.totalVolume)}
+              </p>
+              <p className="text-sm text-text-tertiary">Últimas {timeRange}</p>
             </div>
-            <p className="text-2xl font-bold text-text-primary">R$ 45.2K</p>
-            <p className="text-sm text-text-tertiary">Últimas {timeRange}</p>
-          </div>
 
-          <div className="bg-bg-secondary rounded-xl p-4 border border-border-primary">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-secondary/10 rounded-lg">
-                <Clock className="w-5 h-5 text-secondary" />
+            <div className="bg-bg-secondary rounded-xl p-4 border border-border-primary">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-secondary/10 rounded-lg">
+                  <Clock className="w-5 h-5 text-secondary" />
+                </div>
+                <span className="text-sm text-text-secondary">Transações</span>
               </div>
-              <span className="text-sm text-text-secondary">Transações</span>
+              <p className="text-2xl font-bold text-text-primary">
+                {data.stats.totalTransactions}
+              </p>
+              <p className="text-sm text-text-tertiary">Últimas {timeRange}</p>
             </div>
-            <p className="text-2xl font-bold text-text-primary">1,234</p>
-            <p className="text-sm text-text-tertiary">Últimas {timeRange}</p>
           </div>
-        </div>
+        ) : null}
 
         {/* Trending List */}
-        <div className="space-y-4">
-          {mockTrending.map((track, index) => (
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </div>
+        ) : error ? (
+          <div className="text-center py-12">
+            <p className="text-text-secondary">{error}</p>
+          </div>
+        ) : data && data.tracks.length > 0 ? (
+          <div className="space-y-4">
+            {data.tracks.map((track, index) => (
             <Link href={`/track/${track.id}`} key={track.id}>
               <div className="flex items-center gap-4 bg-bg-secondary rounded-xl p-4 border border-border-primary hover:border-primary/50 transition-colors cursor-pointer group">
                 {/* Rank */}
@@ -172,11 +176,15 @@ export default function TrendingPage() {
 
                 {/* Cover Art */}
                 <div className="relative w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 bg-gradient-to-br from-primary-400 to-secondary-400">
-                  <div className="w-full h-full flex items-center justify-center">
-                    <span className="text-white font-bold text-lg">
-                      {track.title[0]}
-                    </span>
-                  </div>
+                  {track.coverArt ? (
+                    <img src={track.coverArt} alt={track.title} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <span className="text-white font-bold text-lg">
+                        {track.title[0]}
+                      </span>
+                    </div>
+                  )}
                   <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
                     <Play className="w-6 h-6 text-white" />
                   </div>
@@ -226,7 +234,13 @@ export default function TrendingPage() {
               </div>
             </Link>
           ))}
-        </div>
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <Music className="w-12 h-12 text-text-tertiary mx-auto mb-4" />
+            <p className="text-text-secondary">Nenhuma música em trending no momento</p>
+          </div>
+        )}
       </div>
     </AppLayout>
   );

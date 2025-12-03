@@ -132,7 +132,7 @@ export default function SignupPage() {
 
       {/* Error Message */}
       {error && (
-        <div className="mb-6 p-4 rounded-xl bg-error/10 border border-error/20 text-error text-sm">
+        <div className="mb-6 p-4 rounded-xl bg-error/10 border border-error/20 text-error text-sm" data-testid="error-message">
           {error}
         </div>
       )}
@@ -142,6 +142,8 @@ export default function SignupPage() {
         <Input
           label="Email"
           type="email"
+          name="email"
+          data-testid="email-input"
           placeholder="seu@email.com"
           value={email}
           onChange={setEmail}
@@ -153,6 +155,8 @@ export default function SignupPage() {
           <Input
             label="Senha"
             type={showPassword ? "text" : "password"}
+            name="password"
+            data-testid="password-input"
             placeholder="••••••••"
             value={password}
             onChange={setPassword}
@@ -174,11 +178,11 @@ export default function SignupPage() {
 
         {/* Password Requirements */}
         {password && (
-          <div className="p-4 rounded-xl bg-bg-secondary border border-border-default">
+          <div className="p-4 rounded-xl bg-bg-secondary border border-border-default" data-testid="password-requirements">
             <p className="text-sm font-medium text-text-secondary mb-2">
               Requisitos da senha:
             </p>
-            <ul className="space-y-1">
+            <ul className="space-y-1" data-testid="password-error">
               {passwordRequirements.map((req, index) => (
                 <li
                   key={index}
@@ -253,6 +257,7 @@ export default function SignupPage() {
           loading={isLoading}
           disabled={!allRequirementsMet || !passwordsMatch || !email}
           className="mt-6"
+          data-testid="signup-button"
         >
           Criar Conta
         </Button>

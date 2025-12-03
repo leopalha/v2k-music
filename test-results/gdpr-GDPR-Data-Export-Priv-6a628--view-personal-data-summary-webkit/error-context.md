@@ -1,0 +1,55 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e7]:
+      - link [ref=e8]:
+        - /url: /
+        - img [ref=e9]:
+          - generic [ref=e20]: V2K
+          - generic [ref=e21]: MUSIC
+      - heading "Invista em Royalties Musicais" [level=1] [ref=e22]
+      - paragraph [ref=e23]: A bolsa de valores da música. Compre tokens, ganhe royalties mensais e negocie 24/7.
+      - generic [ref=e24]:
+        - generic [ref=e25]:
+          - generic [ref=e26]: R$ 2.5M+
+          - generic [ref=e27]: Volume Negociado
+        - generic [ref=e28]:
+          - generic [ref=e29]: 2.500+
+          - generic [ref=e30]: Investidores Ativos
+        - generic [ref=e31]:
+          - generic [ref=e32]: "156"
+          - generic [ref=e33]: Músicas Tokenizadas
+        - generic [ref=e34]:
+          - generic [ref=e35]: 18.5%
+          - generic [ref=e36]: ROI Médio Anual
+    - generic [ref=e40]:
+      - link [ref=e42]:
+        - /url: /
+        - img [ref=e43]:
+          - generic [ref=e54]: V2K
+          - generic [ref=e55]: MUSIC
+      - generic [ref=e56]:
+        - heading "Bem-vindo de volta" [level=1] [ref=e57]
+        - paragraph [ref=e58]: Faça login para acessar sua conta
+        - generic [ref=e59]:
+          - generic [ref=e60]:
+            - generic [ref=e61]: Email
+            - textbox "seu@email.com" [ref=e64]
+          - generic [ref=e65]:
+            - generic [ref=e66]: Senha
+            - textbox "••••••••" [ref=e69]: Test123!@#
+          - link "Esqueceu a senha?" [ref=e71]:
+            - /url: /forgot-password
+          - button "Entrar" [ref=e72]
+        - paragraph [ref=e74]:
+          - text: Não tem uma conta?
+          - link "Cadastre-se" [ref=e75]:
+            - /url: /signup
+  - region "Notifications (F8)":
+    - list
+  - button "Open Next.js Dev Tools" [ref=e81] [cursor=pointer]:
+    - img [ref=e82]
+  - alert [ref=e87]
+```

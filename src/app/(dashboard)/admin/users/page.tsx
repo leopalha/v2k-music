@@ -114,6 +114,7 @@ export default function AdminUsersPage() {
                 setSearch(value);
                 setPage(1);
               }}
+              data-testid="search-users"
             />
           </div>
         </CardContent>
@@ -133,6 +134,7 @@ export default function AdminUsersPage() {
                 <div
                   key={user.id}
                   className="flex items-center justify-between p-4 border rounded-lg"
+                  data-testid="user-item"
                 >
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
@@ -154,7 +156,7 @@ export default function AdminUsersPage() {
                         <CheckCircle className="h-4 w-4 text-green-500" />
                       )}
                     </div>
-                    <div className="text-sm text-muted-foreground">{user.email}</div>
+                    <div className="text-sm text-muted-foreground" data-testid="user-email">{user.email}</div>
                     <div className="text-xs text-muted-foreground mt-1">
                       {user._count.transactions} transações • {user._count.portfolio}{' '}
                       músicas • {user._count.comments} comentários

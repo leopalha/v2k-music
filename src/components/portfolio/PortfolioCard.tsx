@@ -84,7 +84,7 @@ export function PortfolioCard({
 
   return (
     <Link href={`/track/${trackId}`}>
-      <div className="bg-bg-secondary border border-border-primary rounded-xl p-4 hover:border-primary transition-all hover:shadow-lg hover:shadow-primary/5 group">
+      <div className="bg-bg-secondary border border-border-primary rounded-xl p-4 hover:border-primary transition-all hover:shadow-lg hover:shadow-primary/5 group" data-testid="holding-item">
         {/* Header */}
         <div className="flex items-start gap-4 mb-4">
           {/* Cover */}

@@ -1,0 +1,76 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - link [ref=e5] [cursor=pointer]:
+        - /url: /
+        - img [ref=e6]: V2KMUSIC
+      - navigation [ref=e19]:
+        - generic [ref=e20]:
+          - link "Discover" [ref=e21] [cursor=pointer]:
+            - /url: /marketplace
+            - img [ref=e22]
+            - generic [ref=e25]: Discover
+          - link "Portfolio" [ref=e26] [cursor=pointer]:
+            - /url: /portfolio
+            - img [ref=e27]
+            - generic [ref=e30]: Portfolio
+          - link "Favorites" [ref=e31] [cursor=pointer]:
+            - /url: /favorites
+            - img [ref=e32]
+            - generic [ref=e34]: Favorites
+          - link "Trending" [ref=e35] [cursor=pointer]:
+            - /url: /trending
+            - img [ref=e36]
+            - generic [ref=e39]: Trending
+        - generic [ref=e41]:
+          - link "Leaderboard" [ref=e42] [cursor=pointer]:
+            - /url: /leaderboard
+            - img [ref=e43]
+            - generic [ref=e50]: Leaderboard
+          - link "My Tracks" [ref=e51] [cursor=pointer]:
+            - /url: /artist/dashboard
+            - img [ref=e52]
+            - generic [ref=e56]: My Tracks
+      - link "U Minha Conta Ver perfil" [ref=e58] [cursor=pointer]:
+        - /url: /profile
+        - generic [ref=e60]: U
+        - generic [ref=e61]:
+          - paragraph [ref=e62]: Minha Conta
+          - paragraph [ref=e63]: Ver perfil
+        - img [ref=e64]
+    - main [ref=e67]:
+      - generic [ref=e69]:
+        - generic [ref=e73]:
+          - img [ref=e75]
+          - textbox "Buscar músicas, artistas..." [ref=e78]
+        - generic [ref=e79]:
+          - button "Connect Wallet" [ref=e82]:
+            - img [ref=e83]
+            - text: Connect Wallet
+          - button "Notifications" [ref=e87]:
+            - img [ref=e88]
+      - generic [ref=e92]:
+        - generic [ref=e95]:
+          - heading "Histórico de Transações" [level=1] [ref=e96]
+          - paragraph [ref=e97]: Acompanhe todas as suas transações na plataforma
+        - generic [ref=e98]:
+          - button "Filtros" [ref=e99]:
+            - img [ref=e100]
+            - generic [ref=e102]: Filtros
+          - generic [ref=e103]:
+            - button "Exportar PDF" [disabled]:
+              - img
+              - text: Exportar PDF
+            - button "CSV" [disabled]:
+              - img
+              - text: CSV
+        - img [ref=e105]
+  - region "Notifications (F8)":
+    - list
+  - button "Open Next.js Dev Tools" [ref=e112] [cursor=pointer]:
+    - img [ref=e113]
+  - alert [ref=e117]
+```

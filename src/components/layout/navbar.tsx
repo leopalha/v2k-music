@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Search, Menu, X } from "lucide-react";
+import { Search, Menu, X, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { Input, UserAvatar } from "@/components/ui";
 import { ConnectWallet } from "@/components/web3";
@@ -58,6 +58,18 @@ export function NavBar({
               iconPosition="left"
               className="bg-bg-elevated border-transparent focus:border-primary-400"
             />
+            {searchQuery && (
+              <button
+                onClick={() => {
+                  setSearchQuery("");
+                  setIsSearchFocused(false);
+                }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-bg-secondary rounded-full transition-colors"
+                aria-label="Limpar busca"
+              >
+                <XCircle className="w-4 h-4 text-text-tertiary hover:text-text-primary" />
+              </button>
+            )}
             <SearchDropdown
               query={searchQuery}
               isOpen={isSearchFocused}
@@ -92,6 +104,7 @@ export function NavBar({
           <Link
             href="/profile"
             className="lg:hidden p-1 rounded-full hover:ring-2 hover:ring-primary-400/50 transition-all"
+            data-testid="user-menu"
           >
             <UserAvatar name="User" size="sm" />
           </Link>
@@ -101,15 +114,29 @@ export function NavBar({
       {/* Mobile Search Expanded */}
       {showMobileSearch && (
         <div className="md:hidden px-4 pb-4 relative">
-          <Input
-            placeholder="Buscar músicas, artistas..."
-            value={searchQuery}
-            onChange={setSearchQuery}
-            onFocus={() => setIsSearchFocused(true)}
-            icon={<Search className="w-4 h-4" />}
-            iconPosition="left"
-            className="bg-bg-elevated border-transparent focus:border-primary-400"
-          />
+          <div className="relative">
+            <Input
+              placeholder="Buscar músicas, artistas..."
+              value={searchQuery}
+              onChange={setSearchQuery}
+              onFocus={() => setIsSearchFocused(true)}
+              icon={<Search className="w-4 h-4" />}
+              iconPosition="left"
+              className="bg-bg-elevated border-transparent focus:border-primary-400"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => {
+                  setSearchQuery("");
+                  setIsSearchFocused(false);
+                }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-bg-secondary rounded-full transition-colors"
+                aria-label="Limpar busca"
+              >
+                <XCircle className="w-4 h-4 text-text-tertiary hover:text-text-primary" />
+              </button>
+            )}
+          </div>
           <SearchDropdown
             query={searchQuery}
             isOpen={isSearchFocused}

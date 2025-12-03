@@ -11,6 +11,8 @@ export interface InputProps
   icon?: React.ReactNode;
   iconPosition?: "left" | "right";
   onChange?: (value: string) => void;
+  name?: string;
+  "data-testid"?: string;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
@@ -25,6 +27,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       required,
       disabled,
       onChange,
+      name,
+      "data-testid": dataTestId,
       ...props
     },
     ref
@@ -47,6 +51,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           <input
             type={type}
             ref={ref}
+            name={name}
+            data-testid={dataTestId}
             disabled={disabled}
             onChange={(e) => onChange?.(e.target.value)}
             className={cn(

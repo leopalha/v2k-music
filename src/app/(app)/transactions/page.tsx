@@ -488,8 +488,9 @@ export default function TransactionsPage() {
                       <tr
                         key={tx.id}
                         className="border-b border-border-subtle last:border-0 hover:bg-bg-secondary transition-colors"
+                        data-testid="transaction-item"
                       >
-                        <td className="px-4 py-3 text-sm text-text-secondary">
+                        <td className="px-4 py-3 text-sm text-text-secondary" data-testid="transaction-date">
                           {new Date(tx.createdAt).toLocaleDateString("pt-BR")}
                           <br />
                           <span className="text-xs text-text-tertiary">
@@ -504,6 +505,7 @@ export default function TransactionsPage() {
                             className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${getTypeColor(
                               tx.type
                             )}`}
+                            data-testid="transaction-type"
                           >
                             {getTypeIcon(tx.type)}
                             {getTypeLabel(tx.type)}
@@ -538,7 +540,7 @@ export default function TransactionsPage() {
                           {tx.amount} tokens
                         </td>
                         <td className="px-4 py-3">
-                          <p className="text-sm font-medium text-text-primary">
+                          <p className="text-sm font-medium text-text-primary" data-testid="transaction-amount">
                             R$ {tx.totalValue.toFixed(2)}
                           </p>
                           {tx.fee > 0 && (
@@ -652,7 +654,7 @@ export default function TransactionsPage() {
             )}
           </>
         ) : (
-          <div className="text-center py-16">
+          <div className="text-center py-16" data-testid="empty-transactions">
             <Receipt className="w-16 h-16 text-text-tertiary mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-text-primary mb-2">
               Nenhuma transação encontrada

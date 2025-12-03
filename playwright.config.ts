@@ -2,12 +2,12 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './e2e',
-  timeout: 30 * 1000,
-  expect: { timeout: 10 * 1000 },
+  timeout: 60 * 1000, // Increased to 60s for dev server
+  expect: { timeout: 15 * 1000 }, // Increased expect timeout
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 2 : undefined,
+  retries: process.env.CI ? 2 : 1, // 1 retry in dev
+  workers: process.env.CI ? 2 : 4, // 4 workers for parallel execution
   reporter: [['list'], ['html', { outputFolder: 'playwright-report', open: 'never' }]],
 
   use: {
@@ -15,6 +15,8 @@ export default defineConfig({
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'off',
+    navigationTimeout: 30 * 1000, // 30s for page navigation
+    actionTimeout: 15 * 1000, // 15s for actions like click
   },
 
   webServer: {

@@ -108,6 +108,7 @@ export function FilterBar({
             size="sm"
             onClick={() => setShowFilters(!showFilters)}
             icon={<Filter className="w-4 h-4" />}
+            data-testid="genre-filter"
           >
             Filtros
             {activeFilterCount > 0 && (
@@ -216,6 +217,7 @@ export function FilterBar({
                 <button
                   key={genre}
                   onClick={() => handleGenreToggle(genre)}
+                  data-testid={`genre-${genre.toLowerCase()}`}
                   className={cn(
                     "px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all",
                     filters.genres.includes(genre)

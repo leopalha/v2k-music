@@ -122,7 +122,7 @@ export function TrackCard({
 
   const listCard = variant === "list" ? (
     <>
-      <Link href={`/track/${track.id}`}>
+      <Link href={`/track/${track.id}`} data-testid="track-card">
         <div className="flex items-center gap-4 p-4 rounded-xl bg-bg-secondary border border-border-default hover:bg-bg-elevated hover:border-border-strong transition-all cursor-pointer group">
           {/* Small Cover Art */}
           <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
@@ -160,10 +160,10 @@ export function TrackCard({
 
           {/* Info */}
           <div className="flex-1 min-w-0">
-            <h3 className="text-base font-semibold text-text-primary truncate">
+            <h3 className="text-base font-semibold text-text-primary truncate" data-testid="track-title">
               {track.title}
             </h3>
-            <p className="text-sm text-text-tertiary truncate">{track.artist}</p>
+            <p className="text-sm text-text-tertiary truncate" data-testid="track-artist">{track.artist}</p>
           </div>
 
           {/* Stats (right side) */}
@@ -177,7 +177,7 @@ export function TrackCard({
               </div>
 
               <div className="text-right">
-                <div className="text-lg font-mono font-medium text-text-primary">
+                <div className="text-lg font-mono font-medium text-text-primary" data-testid="track-price">
                   {formatCurrency(track.pricePerToken)}
                 </div>
                 <div

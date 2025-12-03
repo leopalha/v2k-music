@@ -1,0 +1,43 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e5]:
+    - banner [ref=e6]:
+      - generic [ref=e7]:
+        - link "V V2K" [ref=e8] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e10]: V
+          - generic [ref=e11]: V2K
+        - button "Pular por agora" [ref=e12]
+    - generic [ref=e15]:
+      - generic [ref=e17]:
+        - img [ref=e19]
+        - generic [ref=e22]: Dados Pessoais
+      - generic [ref=e24]:
+        - img [ref=e26]
+        - generic [ref=e28]: Contato
+      - generic [ref=e30]:
+        - img [ref=e32]
+        - generic [ref=e36]: Termos
+    - generic [ref=e39]:
+      - heading "Dados Pessoais" [level=2] [ref=e40]
+      - paragraph [ref=e41]: Precisamos de algumas informações para verificar sua identidade.
+      - generic [ref=e42]:
+        - generic [ref=e43]:
+          - generic [ref=e44]: Nome Completo *
+          - textbox "Seu nome completo" [ref=e46]
+        - generic [ref=e47]:
+          - generic [ref=e48]: CPF *
+          - textbox "000.000.000-00" [ref=e50]
+        - generic [ref=e51]:
+          - generic [ref=e52]: Data de Nascimento *
+          - textbox [ref=e54]
+    - contentinfo [ref=e55]:
+      - button "Continuar" [ref=e57]
+  - region "Notifications (F8)":
+    - list
+  - button "Open Next.js Dev Tools" [ref=e63] [cursor=pointer]:
+    - img [ref=e64]
+  - alert [ref=e67]
+```

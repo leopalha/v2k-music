@@ -1,0 +1,78 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - link [ref=e5] [cursor=pointer]:
+        - /url: /
+        - img [ref=e6]:
+          - generic [ref=e17]: V2K
+          - generic [ref=e18]: MUSIC
+      - navigation [ref=e19]:
+        - generic [ref=e20]:
+          - link "Discover" [ref=e21] [cursor=pointer]:
+            - /url: /marketplace
+            - img [ref=e22]
+            - generic [ref=e25]: Discover
+          - link "Portfolio" [ref=e26] [cursor=pointer]:
+            - /url: /portfolio
+            - img [ref=e27]
+            - generic [ref=e30]: Portfolio
+          - link "Favorites" [ref=e31] [cursor=pointer]:
+            - /url: /favorites
+            - img [ref=e32]
+            - generic [ref=e34]: Favorites
+          - link "Trending" [ref=e35] [cursor=pointer]:
+            - /url: /trending
+            - img [ref=e36]
+            - generic [ref=e39]: Trending
+        - generic [ref=e41]:
+          - link "Leaderboard" [ref=e42] [cursor=pointer]:
+            - /url: /leaderboard
+            - img [ref=e43]
+            - generic [ref=e49]: Leaderboard
+          - link "My Tracks" [ref=e50] [cursor=pointer]:
+            - /url: /artist/dashboard
+            - img [ref=e51]
+            - generic [ref=e55]: My Tracks
+      - link "U Minha Conta Ver perfil" [ref=e57] [cursor=pointer]:
+        - /url: /profile
+        - generic [ref=e59]: U
+        - generic [ref=e60]:
+          - paragraph [ref=e61]: Minha Conta
+          - paragraph [ref=e62]: Ver perfil
+        - img [ref=e63]
+    - main [ref=e66]:
+      - generic [ref=e68]:
+        - generic [ref=e72]:
+          - img [ref=e74]
+          - textbox "Buscar músicas, artistas..." [ref=e77]
+        - generic [ref=e78]:
+          - button "Connect Wallet" [ref=e81]:
+            - img [ref=e82]
+            - text: Connect Wallet
+          - button "Notifications" [ref=e86]:
+            - img [ref=e87]
+      - generic [ref=e91]:
+        - generic [ref=e94]:
+          - heading "Histórico de Transações" [level=1] [ref=e95]
+          - paragraph [ref=e96]: Acompanhe todas as suas transações na plataforma
+        - generic [ref=e97]:
+          - button "Filtros" [ref=e98]:
+            - img [ref=e99]
+            - generic [ref=e101]: Filtros
+          - generic [ref=e102]:
+            - button "Exportar PDF" [disabled]:
+              - img
+              - text: Exportar PDF
+            - button "CSV" [disabled]:
+              - img
+              - text: CSV
+        - img [ref=e104]
+  - region "Notifications (F8)":
+    - list
+  - button "Open Next.js Dev Tools" [ref=e111] [cursor=pointer]:
+    - img [ref=e112]
+  - alert [ref=e115]
+```

@@ -53,6 +53,8 @@ const config: Config = {
     '<rootDir>/.next/',
     '<rootDir>/out/',
     '<rootDir>/build/',
+    '<rootDir>/e2e/',  // E2E tests run with Playwright, not Jest
+    '<rootDir>/__tests__/helpers/',  // Helper files, not tests
   ],
   
   // Transform ignore patterns

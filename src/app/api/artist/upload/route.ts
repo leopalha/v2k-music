@@ -1,12 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { authOptions } from '@/lib/auth/auth-options';
 import { prisma } from '@/lib/db/prisma';
 import { uploadAudio, uploadImage, validateAudioFile, validateImageFile } from '@/lib/upload/storage';
+import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
 export async function POST(request: NextRequest) {
   try {
-    // Check authentication
+    // Rate limiting (prevent upload spam)
+    const rateLimitCheck = await checkRateLimit(request, RATE_LIMITS.UPLOAD);
+    if (!rateLimitCheck.allowed) {
+      return rateLimitCheck.response;
+    }
+
     const session = await getServerSession(authOptions);
     
     if (!session?.user?.id) {
@@ -104,13 +110,42 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create track in database with PENDING status
+    // Validate genre against enum
+    const validGenres = ['TRAP', 'FUNK', 'RAP', 'RNB', 'REGGAETON', 'POP', 'ELECTRONIC', 'ROCK', 'OTHER'];
+    const genreUpper = genre.toUpperCase();
+    if (!validGenres.includes(genreUpper)) {
+      return NextResponse.json(
+        { error: `Gênero inválido. Opções: ${validGenres.join(', ')}` },
+        { status: 400 }
+      );
+    }
+
+    // Check if artist should be auto-approved
+    // Auto-approve artists with verified KYC and 5+ published tracks
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        _count: {
+          select: {
+            tracks: {
+              where: { status: 'LIVE' }
+            }
+          }
+        }
+      }
+    });
+
+    const isVerifiedArtist = user?.kycStatus === 'VERIFIED';
+    const publishedTracksCount = user?._count?.tracks || 0;
+    const shouldAutoApprove = isVerifiedArtist && publishedTracksCount >= 5;
+
+    // Create track in database with auto-approve for trusted artists
     const track = await prisma.track.create({
       data: {
         title,
         artistName,
         artistId: userId,
-        genre: genre as any, // TODO: validate against Genre enum
+        genre: genreUpper as any,
         coverUrl,
         audioUrl,
         duration: duration || 0,
@@ -119,20 +154,61 @@ export async function POST(request: NextRequest) {
         totalSupply,
         availableSupply: totalSupply,
         marketCap: currentPrice * totalSupply,
-        status: 'PENDING',
+        status: shouldAutoApprove ? 'LIVE' : 'PENDING',
         aiScore: 50, // Default score
         predictedROI: 0.05, // 5% default
         viralProbability: 0.5, // 50% default
       },
     });
 
-    // TODO: Create notification for admin review
-    // await createNotification({
-    //   userId: 'ADMIN',
-    //   type: 'NEW_TRACK_REVIEW',
-    //   message: `Nova música "${title}" enviada por ${session.user.name} precisa de aprovação`,
-    //   trackId: track.id,
-    // });
+    // Notification based on auto-approve
+    if (shouldAutoApprove) {
+      // Notify artist that track is live immediately
+      await prisma.notification.create({
+        data: {
+          userId,
+          type: 'TRACK_APPROVED',
+          title: 'Música Publicada! 🎵',
+          message: `Sua música "${title}" foi publicada automaticamente no marketplace!`,
+          trackId: track.id,
+          read: false,
+        },
+      });
+    } else {
+      // Notify artist that track is pending review
+      await prisma.notification.create({
+        data: {
+          userId,
+          type: 'TRACK_UPLOADED',
+          title: 'Música Enviada',
+          message: `Sua música "${title}" está em revisão. Você será notificado quando for aprovada.`,
+          trackId: track.id,
+          read: false,
+        },
+      });
+
+      // Notify all admins about new track pending review
+      const admins = await prisma.user.findMany({ 
+        where: { 
+          role: { 
+            in: ['ADMIN', 'SUPER_ADMIN'] 
+          } 
+        },
+        select: { id: true }
+      });
+      
+      // Create notifications for all admins
+      await prisma.notification.createMany({
+        data: admins.map(admin => ({
+          userId: admin.id,
+          type: 'TRACK_UPLOADED',
+          title: 'Nova Música Para Revisar',
+          message: `Nova música "${title}" enviada por ${artistName} precisa de aprovação`,
+          trackId: track.id,
+          read: false,
+        }))
+      });
+    }
 
     return NextResponse.json({
       success: true,
@@ -142,7 +218,10 @@ export async function POST(request: NextRequest) {
         status: track.status,
         coverUrl: track.coverUrl,
       },
-      message: 'Música enviada com sucesso! Aguarde a aprovação do admin.',
+      autoApproved: shouldAutoApprove,
+      message: shouldAutoApprove 
+        ? 'Música publicada automaticamente no marketplace!' 
+        : 'Música enviada com sucesso! Aguarde a aprovação do admin.',
     });
   } catch (error) {
     console.error('[TRACK_UPLOAD_ERROR]', error);

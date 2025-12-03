@@ -66,6 +66,8 @@ function SignInForm() {
               </label>
               <Input
                 type="email"
+                name="email"
+                data-testid="email-input"
                 value={email}
                 onChange={setEmail}
                 placeholder="seu@email.com"
@@ -80,6 +82,8 @@ function SignInForm() {
               </label>
               <Input
                 type="password"
+                name="password"
+                data-testid="password-input"
                 value={password}
                 onChange={setPassword}
                 placeholder="••••••••"
@@ -102,6 +106,7 @@ function SignInForm() {
               variant="primary"
               className="w-full"
               disabled={isLoading}
+              data-testid="signin-button"
             >
               {isLoading ? "Entrando..." : "Entrar"}
             </Button>

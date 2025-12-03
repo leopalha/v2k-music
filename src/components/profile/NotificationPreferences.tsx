@@ -160,6 +160,7 @@ export function NotificationPreferences() {
                   onChange={() => handleToggle(option.key)}
                   disabled={option.disabled || isSaving}
                   className="sr-only peer"
+                  data-testid={option.key === "emailNotifications" ? "notification-email" : undefined}
                 />
                 <div className="w-11 h-6 bg-bg-secondary peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary-400 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-400"></div>
               </label>

@@ -94,7 +94,10 @@ export default function LoginPage() {
 
       {/* Error Message */}
       {error && (
-        <div className="mb-6 p-4 rounded-xl bg-error/10 border border-error/20 text-error text-sm">
+        <div 
+          className="mb-6 p-4 rounded-xl bg-error/10 border border-error/20 text-error text-sm"
+          data-testid="error-message"
+        >
           {error}
         </div>
       )}
@@ -104,6 +107,7 @@ export default function LoginPage() {
         <Input
           label="Email"
           type="email"
+          name="email"
           placeholder="seu@email.com"
           value={email}
           onChange={setEmail}
@@ -115,6 +119,7 @@ export default function LoginPage() {
           <Input
             label="Senha"
             type={showPassword ? "text" : "password"}
+            name="password"
             placeholder="••••••••"
             value={password}
             onChange={setPassword}

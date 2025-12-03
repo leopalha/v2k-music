@@ -48,6 +48,9 @@ const notificationIcons: Record<NotificationType, React.ElementType> = {
   // Tracks
   NEW_TRACK_RELEASE: Music,
   TRACK_MILESTONE: TrendingUp,
+  TRACK_APPROVED: CheckCircle,
+  TRACK_REJECTED: XCircle,
+  TRACK_UPLOADED: Music,
 
   // Referrals
   REFERRAL_SIGNUP: Users,
@@ -76,6 +79,9 @@ const notificationColors: Record<NotificationType, string> = {
   // Tracks
   NEW_TRACK_RELEASE: "text-primary-400",
   TRACK_MILESTONE: "text-success",
+  TRACK_APPROVED: "text-success",
+  TRACK_REJECTED: "text-error",
+  TRACK_UPLOADED: "text-info",
 
   // Referrals
   REFERRAL_SIGNUP: "text-info",

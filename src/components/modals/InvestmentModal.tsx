@@ -96,8 +96,8 @@ export default function InvestmentModal({
     setError("");
 
     try {
-      // Create payment intent
-      const createRes = await fetch("/api/investments/create", {
+      // Create checkout session
+      const checkoutRes = await fetch("/api/checkout/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -106,23 +106,21 @@ export default function InvestmentModal({
         }),
       });
 
-      const createData = await createRes.json();
+      const checkoutData = await checkoutRes.json();
 
-      if (!createRes.ok) {
-        if (createData.requiresKyc) {
+      if (!checkoutRes.ok) {
+        if (checkoutData.requiresKyc) {
           setError("Complete seu cadastro (KYC) antes de investir");
           setTimeout(() => router.push("/onboarding"), 2000);
           return;
         }
-        throw new Error(createData.error || "Erro ao criar investimento");
+        throw new Error(checkoutData.error || "Erro ao criar checkout");
       }
 
       // Check if we're in mock mode (dev only)
-      const isMockPayment = createData.paymentIntent.id.startsWith('pi_mock_');
-
-      if (isMockPayment) {
+      if (checkoutData.isMockMode) {
         // DEV MODE: Simulate payment success
-        console.log('[DEV] Mock Payment Intent created:', createData.paymentIntent.id);
+        console.log('[DEV] Mock Payment created:', checkoutData.paymentIntent.id);
         
         // Simulate payment delay
         await new Promise((resolve) => setTimeout(resolve, 1500));
@@ -132,54 +130,44 @@ export default function InvestmentModal({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            paymentIntentId: createData.paymentIntent.id,
+            paymentIntentId: checkoutData.paymentIntent.id,
           }),
         });
         
         if (!simulateRes.ok) {
           throw new Error('Erro ao simular pagamento');
         }
+
+        // Confirm investment on backend
+        const confirmRes = await fetch("/api/investments/confirm", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            paymentIntentId: checkoutData.paymentIntent.id,
+          }),
+        });
+
+        const confirmData = await confirmRes.json();
+
+        if (!confirmRes.ok) {
+          throw new Error(confirmData.error || "Erro ao confirmar investimento");
+        }
+
+        // Show success
+        setSuccess(true);
+        setTimeout(() => {
+          onClose();
+          router.push("/portfolio");
+        }, 2000);
       } else {
-        // PRODUCTION: Use real Stripe payment
-        // The backend should return a Checkout Session URL
-        if (createData.checkoutUrl) {
-          // Redirect to Stripe Checkout
-          window.location.href = createData.checkoutUrl;
+        // PRODUCTION: Redirect to Stripe Checkout
+        if (checkoutData.checkoutUrl) {
+          window.location.href = checkoutData.checkoutUrl;
           return;
         }
         
-        // Fallback: For now, show not implemented message
-        throw new Error('Stripe Checkout não configurado. Configure STRIPE_SECRET_KEY no .env');
+        throw new Error('Checkout URL não retornada. Verifique configuração do Stripe');
       }
-
-      // Confirm investment on backend
-      const confirmRes = await fetch("/api/investments/confirm", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          paymentIntentId: createData.paymentIntent.id,
-        }),
-      });
-
-      const confirmData = await confirmRes.json();
-
-      if (!confirmRes.ok) {
-        if (confirmData.requiresWallet) {
-          setError(
-            "Você precisa conectar uma carteira. Complete seu perfil."
-          );
-          setTimeout(() => router.push("/profile"), 2000);
-          return;
-        }
-        throw new Error(confirmData.error || "Erro ao confirmar investimento");
-      }
-
-      // Show success
-      setSuccess(true);
-      setTimeout(() => {
-        onClose();
-        router.push("/portfolio");
-      }, 3000);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Erro ao processar pagamento"

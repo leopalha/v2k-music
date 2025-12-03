@@ -243,7 +243,7 @@ export default function ArtistDashboardPage() {
         ) : null}
 
         {/* My Tracks Section */}
-        <div className="bg-bg-secondary rounded-xl border border-border-primary overflow-hidden">
+        <div className="bg-bg-secondary rounded-xl border border-border-primary overflow-hidden" data-testid="artist-tracks">
           <div className="p-6 border-b border-border-subtle">
             <h2 className="text-lg font-semibold text-text-primary">Minhas Músicas</h2>
           </div>
@@ -259,6 +259,7 @@ export default function ArtistDashboardPage() {
                 <div
                   key={track.id}
                   className="p-6 hover:bg-bg-elevated transition-colors"
+                  data-testid="track-item"
                 >
                   <div className="flex items-center gap-4">
                     {/* Cover */}
@@ -354,7 +355,7 @@ export default function ArtistDashboardPage() {
               ))}
             </div>
           ) : (
-            <div className="p-12 text-center">
+            <div className="p-12 text-center" data-testid="empty-state">
               <Upload className="w-12 h-12 text-text-tertiary mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-text-primary mb-2">
                 Nenhuma música ainda

@@ -4,11 +4,18 @@
  */
 
 import '@testing-library/jest-dom';
+import { config } from 'dotenv';
 
-// Mock environment variables
-process.env.NEXTAUTH_URL = 'http://localhost:5000';
-process.env.NEXTAUTH_SECRET = 'test-secret-key-for-testing-only';
-process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/test';
+// Load environment variables from .env file
+config();
+
+// Set test-specific overrides if needed
+if (!process.env.NEXTAUTH_URL) {
+  process.env.NEXTAUTH_URL = 'http://localhost:5000';
+}
+if (!process.env.NEXTAUTH_SECRET) {
+  process.env.NEXTAUTH_SECRET = 'test-secret-key-for-testing-only';
+}
 
 // Mock Next.js router
 jest.mock('next/navigation', () => ({
@@ -87,6 +94,13 @@ jest.mock('@/lib/cache/redis', () => ({
 
 // Mock fetch globally
 global.fetch = jest.fn();
+
+// Polyfill TextEncoder/TextDecoder for jsPDF
+if (typeof global.TextEncoder === 'undefined') {
+  const { TextEncoder, TextDecoder } = require('util');
+  global.TextEncoder = TextEncoder;
+  global.TextDecoder = TextDecoder;
+}
 
 // Suppress console errors in tests (optional)
 // Uncomment if you want cleaner test output

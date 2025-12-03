@@ -1,0 +1,108 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - link [ref=e5] [cursor=pointer]:
+        - /url: /
+        - img [ref=e6]: V2KMUSIC
+      - navigation [ref=e19]:
+        - generic [ref=e20]:
+          - link "Discover" [ref=e21] [cursor=pointer]:
+            - /url: /marketplace
+            - img [ref=e22]
+            - generic [ref=e25]: Discover
+          - link "Portfolio" [ref=e26] [cursor=pointer]:
+            - /url: /portfolio
+            - img [ref=e27]
+            - generic [ref=e30]: Portfolio
+          - link "Favorites" [ref=e31] [cursor=pointer]:
+            - /url: /favorites
+            - img [ref=e32]
+            - generic [ref=e34]: Favorites
+          - link "Trending" [ref=e35] [cursor=pointer]:
+            - /url: /trending
+            - img [ref=e36]
+            - generic [ref=e39]: Trending
+        - generic [ref=e41]:
+          - link "Leaderboard" [ref=e42] [cursor=pointer]:
+            - /url: /leaderboard
+            - img [ref=e43]
+            - generic [ref=e50]: Leaderboard
+          - link "My Tracks" [ref=e51] [cursor=pointer]:
+            - /url: /artist/dashboard
+            - img [ref=e52]
+            - generic [ref=e56]: My Tracks
+      - link "U Minha Conta Ver perfil" [ref=e58] [cursor=pointer]:
+        - /url: /profile
+        - generic [ref=e60]: U
+        - generic [ref=e61]:
+          - paragraph [ref=e62]: Minha Conta
+          - paragraph [ref=e63]: Ver perfil
+        - img [ref=e64]
+    - main [ref=e67]:
+      - generic [ref=e69]:
+        - generic [ref=e73]:
+          - img [ref=e75]
+          - textbox "Buscar músicas, artistas..." [ref=e78]
+        - generic [ref=e79]:
+          - generic [ref=e80]:
+            - button "Connect Wallet" [disabled]:
+              - img
+              - text: Connect Wallet
+          - button "Notifications" [ref=e82]:
+            - img [ref=e83]
+      - generic [ref=e87]:
+        - generic [ref=e90]:
+          - heading "Meu Portfolio" [level=1] [ref=e91]
+          - paragraph [ref=e92]: Gerencie seus investimentos e acompanhe seus rendimentos
+        - generic [ref=e94]:
+          - generic [ref=e95]:
+            - generic [ref=e96]:
+              - generic [ref=e97]: Valor Total
+              - img [ref=e99]
+            - generic [ref=e102]: R$ 0,00
+            - generic [ref=e103]: +R$ 0,00 (0.00%)
+          - generic [ref=e104]:
+            - generic [ref=e105]:
+              - generic [ref=e106]: Total Investido
+              - img [ref=e108]
+            - generic [ref=e111]: R$ 0,00
+            - generic [ref=e112]: Capital inicial
+          - generic [ref=e113]:
+            - generic [ref=e114]:
+              - generic [ref=e115]: Rendimentos Totais
+              - img [ref=e117]
+            - generic [ref=e122]: R$ 0,00
+            - generic [ref=e123]: Royalties recebidos
+          - generic [ref=e124]:
+            - generic [ref=e125]:
+              - generic [ref=e126]: Músicas
+              - img [ref=e128]
+            - generic [ref=e132]: "0"
+            - generic [ref=e133]: No portfolio
+        - generic [ref=e135]: Carregando analytics do portfolio...
+        - generic [ref=e136]:
+          - generic [ref=e137]:
+            - generic [ref=e138]:
+              - heading "Minhas Músicas (0)" [level=2] [ref=e139]
+              - paragraph [ref=e140]: Conecte sua carteira para ver seus tokens
+            - generic [ref=e141]:
+              - combobox [ref=e142]:
+                - option "Maior Valor" [selected]
+                - option "Melhor Performance"
+                - option "Maior Rendimento"
+              - button "Filtrar" [ref=e143]:
+                - img [ref=e144]
+                - text: Filtrar
+              - button "Exportar" [ref=e146]:
+                - img [ref=e147]
+                - text: Exportar
+          - paragraph [ref=e153]: Você ainda não possui músicas no portfolio
+  - region "Notifications (F8)":
+    - list
+  - button "Open Next.js Dev Tools" [ref=e159] [cursor=pointer]:
+    - img [ref=e160]
+  - alert [ref=e164]
+```

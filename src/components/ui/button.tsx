@@ -46,6 +46,7 @@ export interface ButtonProps
   loading?: boolean;
   icon?: React.ReactNode;
   iconPosition?: "left" | "right";
+  "data-testid"?: string;
 }
 
 const Spinner = () => (
@@ -84,6 +85,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       iconPosition = "left",
       disabled,
       children,
+      "data-testid": dataTestId,
       ...props
     },
     ref
@@ -94,6 +96,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         className={cn(buttonVariants({ variant, size, fullWidth, className }))}
         ref={ref}
         disabled={disabled || loading}
+        data-testid={dataTestId}
         {...props}
       >
         {loading && <Spinner />}

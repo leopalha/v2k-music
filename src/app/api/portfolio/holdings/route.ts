@@ -44,6 +44,29 @@ export async function GET(request: NextRequest) {
       },
     });
 
+    // Get price 24h ago for each track to calculate price change
+    const twentyFourHoursAgo = new Date();
+    twentyFourHoursAgo.setHours(twentyFourHoursAgo.getHours() - 24);
+
+    const trackIds = portfolios.map(p => p.trackId);
+    const priceHistory24h = await prisma.priceHistory.findMany({
+      where: {
+        trackId: { in: trackIds },
+        timestamp: {
+          gte: twentyFourHoursAgo,
+        },
+      },
+      orderBy: {
+        timestamp: 'asc',
+      },
+      distinct: ['trackId'],
+    });
+
+    // Create map of track prices 24h ago
+    const priceMap24h = new Map(
+      priceHistory24h.map(ph => [ph.trackId, ph.price])
+    );
+
     // Transform to frontend format
     const holdings = portfolios.map(portfolio => ({
       trackId: portfolio.trackId,
@@ -57,8 +80,11 @@ export async function GET(request: NextRequest) {
       totalValue: portfolio.currentValue,
       totalInvested: portfolio.totalInvested,
       unrealizedPnL: portfolio.unrealizedPnL,
-      monthlyEarnings: 0, // TODO: Calculate from last 30 days royalties
-      priceChange24h: ((portfolio.track.currentPrice - portfolio.avgBuyPrice) / portfolio.avgBuyPrice) * 100,
+      monthlyEarnings: portfolio.unclaimedRoyalties, // Unclaimed royalties as proxy for monthly earnings
+      priceChange24h: calculatePriceChange24h(
+        portfolio.track.currentPrice,
+        priceMap24h.get(portfolio.trackId) || portfolio.avgBuyPrice
+      ),
       totalRoyaltiesEarned: portfolio.totalRoyaltiesEarned,
       unclaimedRoyalties: portfolio.unclaimedRoyalties,
       genre: portfolio.track.genre,
@@ -92,4 +118,10 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+// Calculate price change percentage over 24h
+function calculatePriceChange24h(currentPrice: number, price24hAgo: number): number {
+  if (price24hAgo === 0) return 0;
+  return ((currentPrice - price24hAgo) / price24hAgo) * 100;
 }

@@ -5,21 +5,15 @@
  */
 
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth/auth-options';
+import { requireAdmin } from '@/lib/auth/admin-middleware';
 import { queryMetrics } from '@/lib/db/query-logger';
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
-
-    // TODO: Add admin check
-    // For now, require authentication
-    if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+    // Require admin authentication
+    const authCheck = await requireAdmin();
+    if (!authCheck.authorized) {
+      return authCheck.response;
     }
 
     // Get query stats

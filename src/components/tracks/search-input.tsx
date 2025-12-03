@@ -100,6 +100,7 @@ export function SearchInput({
           onFocus={() => setIsFocused(true)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
+          data-testid="search-input"
           className={cn(
             "w-full pl-12 pr-10 py-3 rounded-xl",
             "bg-bg-secondary border border-border-default text-text-primary placeholder:text-text-tertiary",

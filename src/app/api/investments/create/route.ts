@@ -3,9 +3,16 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { stripe, STRIPE_CONFIG, STRIPE_MOCK_MODE, createMockPaymentIntent } from '@/lib/stripe/stripe';
 import { prisma } from '@/lib/prisma';
+import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
 export async function POST(request: Request) {
   try {
+    // Rate limiting (critical financial endpoint)
+    const rateLimitCheck = await checkRateLimit(request, RATE_LIMITS.PAYMENT);
+    if (!rateLimitCheck.allowed) {
+      return rateLimitCheck.response;
+    }
+
     // Check authentication
     const session = await getServerSession(authOptions);
 

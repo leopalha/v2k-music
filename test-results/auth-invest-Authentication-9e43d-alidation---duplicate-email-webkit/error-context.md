@@ -1,0 +1,82 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e7]:
+      - link [ref=e8]:
+        - /url: /
+        - img [ref=e9]:
+          - generic [ref=e20]: V2K
+          - generic [ref=e21]: MUSIC
+      - heading "Invista em Royalties Musicais" [level=1] [ref=e22]
+      - paragraph [ref=e23]: A bolsa de valores da música. Compre tokens, ganhe royalties mensais e negocie 24/7.
+      - generic [ref=e24]:
+        - generic [ref=e25]:
+          - generic [ref=e26]: R$ 2.5M+
+          - generic [ref=e27]: Volume Negociado
+        - generic [ref=e28]:
+          - generic [ref=e29]: 2.500+
+          - generic [ref=e30]: Investidores Ativos
+        - generic [ref=e31]:
+          - generic [ref=e32]: "156"
+          - generic [ref=e33]: Músicas Tokenizadas
+        - generic [ref=e34]:
+          - generic [ref=e35]: 18.5%
+          - generic [ref=e36]: ROI Médio Anual
+    - generic [ref=e39]:
+      - generic [ref=e40]:
+        - heading "Crie sua conta" [level=1] [ref=e41]
+        - paragraph [ref=e42]: Comece a investir em royalties musicais hoje
+      - button "Continuar com Google" [ref=e43]
+      - generic [ref=e48]: ou cadastre com email
+      - generic [ref=e49]:
+        - generic [ref=e50]:
+          - generic [ref=e51]: Email *
+          - textbox "seu@email.com" [ref=e53]
+        - generic [ref=e54]:
+          - generic [ref=e55]:
+            - generic [ref=e56]: Senha *
+            - textbox "••••••••" [ref=e58]: Test123!@#
+          - button [ref=e59]:
+            - img [ref=e60]
+        - generic [ref=e63]:
+          - paragraph [ref=e64]: "Requisitos da senha:"
+          - list [ref=e65]:
+            - listitem [ref=e66]:
+              - img [ref=e67]
+              - text: Mínimo 8 caracteres
+            - listitem [ref=e69]:
+              - img [ref=e70]
+              - text: Uma letra maiúscula
+            - listitem [ref=e72]:
+              - img [ref=e73]
+              - text: Um número
+            - listitem [ref=e75]:
+              - img [ref=e76]
+              - text: Um caractere especial
+        - generic [ref=e78]:
+          - generic [ref=e79]:
+            - generic [ref=e80]: Confirmar Senha *
+            - textbox "••••••••" [active] [ref=e82]: Test123!@#
+          - button [ref=e83]:
+            - img [ref=e84]
+        - paragraph [ref=e87]:
+          - text: Ao criar uma conta, você concorda com nossos
+          - link "Termos de Uso" [ref=e88]:
+            - /url: /termos
+          - text: e
+          - link "Política de Privacidade" [ref=e89]:
+            - /url: /privacidade
+          - text: .
+        - button "Criar Conta" [disabled]
+      - paragraph [ref=e90]:
+        - text: Já tem uma conta?
+        - link "Fazer login" [ref=e91]:
+          - /url: /login
+  - region "Notifications (F8)":
+    - list
+  - button "Open Next.js Dev Tools" [ref=e97] [cursor=pointer]:
+    - img [ref=e98]
+  - alert [ref=e103]
+```

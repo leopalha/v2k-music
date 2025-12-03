@@ -3,6 +3,7 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
 
 export const authOptions: NextAuthOptions = {
+  debug: process.env.NODE_ENV === 'development',
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || '',
@@ -15,13 +16,24 @@ export const authOptions: NextAuthOptions = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
+        console.log('[NEXTAUTH] authorize() called');
+        console.log('[NEXTAUTH] credentials:', credentials ? { email: credentials.email, hasPassword: !!credentials.password } : null);
+        
         if (!credentials?.email || !credentials?.password) {
+          console.log('[NEXTAUTH] Missing credentials');
           return null;
         }
 
-        // Dynamic import to avoid bundling server-only code in client
-        const { validateCredentials } = await import('@/lib/auth-helpers');
-        return await validateCredentials(credentials.email, credentials.password);
+        try {
+          // Dynamic import to avoid bundling server-only code in client
+          const { validateCredentials } = await import('@/lib/auth-helpers');
+          const user = await validateCredentials(credentials.email, credentials.password);
+          console.log('[NEXTAUTH] validateCredentials result:', user ? 'USER FOUND' : 'NULL');
+          return user;
+        } catch (error) {
+          console.error('[NEXTAUTH] Error in authorize:', error);
+          return null;
+        }
       },
     }),
   ],

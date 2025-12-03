@@ -171,6 +171,7 @@ model Track {
   favorites       Favorite[]
   priceAlerts     PriceAlert[]
   limitOrders     LimitOrder[]
+  streamHistory   StreamHistory[]
 
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
@@ -613,6 +614,9 @@ enum NotificationType {
   // Tracks
   NEW_TRACK_RELEASE
   TRACK_MILESTONE
+  TRACK_APPROVED    // Track was approved by admin
+  TRACK_REJECTED    // Track was rejected by admin
+  TRACK_UPLOADED    // Track was uploaded and is pending review
 
   // Referrals
   REFERRAL_SIGNUP
@@ -941,4 +945,41 @@ model WebhookDelivery {
   @@index([event])
   @@index([success])
   @@index([createdAt])
+}
+
+// ====== STREAMING HISTORY ======
+
+model StreamHistory {
+  id          String   @id @default(cuid())
+  trackId     String
+  
+  // Time
+  date        DateTime // Daily aggregated data
+  
+  // Platform breakdown
+  platform    StreamPlatform
+  
+  // Metrics
+  streams     Int      @default(0)
+  revenue     Float    @default(0) // Revenue from streams on this day
+  
+  // Relations
+  track       Track    @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+  
+  @@unique([trackId, date, platform]) // One record per track per day per platform
+  @@index([trackId, date])
+  @@index([date])
+  @@index([platform])
+}
+
+enum StreamPlatform {
+  SPOTIFY
+  YOUTUBE
+  TIKTOK
+  APPLE_MUSIC
+  DEEZER
+  SOUNDCLOUD
+  OTHER
 }

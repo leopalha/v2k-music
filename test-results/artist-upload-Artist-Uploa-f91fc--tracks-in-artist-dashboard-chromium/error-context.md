@@ -1,0 +1,93 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - link [ref=e5] [cursor=pointer]:
+        - /url: /
+        - img [ref=e6]:
+          - generic [ref=e17]: V2K
+          - generic [ref=e18]: MUSIC
+      - navigation [ref=e19]:
+        - generic [ref=e20]:
+          - link "Discover" [ref=e21] [cursor=pointer]:
+            - /url: /marketplace
+            - img [ref=e22]
+            - generic [ref=e25]: Discover
+          - link "Portfolio" [ref=e26] [cursor=pointer]:
+            - /url: /portfolio
+            - img [ref=e27]
+            - generic [ref=e30]: Portfolio
+          - link "Favorites" [ref=e31] [cursor=pointer]:
+            - /url: /favorites
+            - img [ref=e32]
+            - generic [ref=e34]: Favorites
+          - link "Trending" [ref=e35] [cursor=pointer]:
+            - /url: /trending
+            - img [ref=e36]
+            - generic [ref=e39]: Trending
+        - generic [ref=e41]:
+          - link "Leaderboard" [ref=e42] [cursor=pointer]:
+            - /url: /leaderboard
+            - img [ref=e43]
+            - generic [ref=e49]: Leaderboard
+          - link "My Tracks" [ref=e50] [cursor=pointer]:
+            - /url: /artist/dashboard
+            - img [ref=e51]
+            - generic [ref=e55]: My Tracks
+      - link "U Minha Conta Ver perfil" [ref=e57] [cursor=pointer]:
+        - /url: /profile
+        - generic [ref=e59]: U
+        - generic [ref=e60]:
+          - paragraph [ref=e61]: Minha Conta
+          - paragraph [ref=e62]: Ver perfil
+        - img [ref=e63]
+    - main [ref=e66]:
+      - generic [ref=e68]:
+        - generic [ref=e72]:
+          - img [ref=e74]
+          - textbox "Buscar músicas, artistas..." [ref=e77]
+        - generic [ref=e78]:
+          - button "Connect Wallet" [ref=e81]:
+            - img [ref=e82]
+            - text: Connect Wallet
+          - button "Notifications" [ref=e86]:
+            - img [ref=e87]
+      - generic [ref=e91]:
+        - generic [ref=e93]:
+          - generic [ref=e94]:
+            - heading "Dashboard do Artista" [level=1] [ref=e95]
+            - paragraph [ref=e96]: Gerencie suas músicas e acompanhe seus ganhos
+          - button "Nova Música" [ref=e97]:
+            - img [ref=e98]
+            - text: Nova Música
+        - generic [ref=e116]:
+          - heading "Minhas Músicas" [level=2] [ref=e118]
+          - generic [ref=e119]:
+            - img [ref=e120]
+            - paragraph [ref=e122]: Carregando músicas...
+        - generic [ref=e123]:
+          - button "Upload de Música Adicionar nova faixa" [ref=e124]:
+            - img [ref=e126]
+            - generic [ref=e129]:
+              - paragraph [ref=e130]: Upload de Música
+              - paragraph [ref=e131]: Adicionar nova faixa
+          - button "Distribuir Royalties Pagar investidores" [disabled] [ref=e132]:
+            - img [ref=e134]
+            - generic [ref=e136]:
+              - paragraph [ref=e137]: Distribuir Royalties
+              - paragraph [ref=e138]: Pagar investidores
+          - link "Ver Analytics Métricas detalhadas" [ref=e139] [cursor=pointer]:
+            - /url: /artist/analytics
+            - button "Ver Analytics Métricas detalhadas" [ref=e140]:
+              - img [ref=e142]
+              - generic [ref=e144]:
+                - paragraph [ref=e145]: Ver Analytics
+                - paragraph [ref=e146]: Métricas detalhadas
+  - region "Notifications (F8)":
+    - list
+  - button "Open Next.js Dev Tools" [ref=e152] [cursor=pointer]:
+    - img [ref=e153]
+  - alert [ref=e156]
+```
